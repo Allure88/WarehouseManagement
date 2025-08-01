@@ -1,0 +1,3 @@
+dotnet ef --startup-project WM.API.csproj --project ../WM.Persistence/WM.Persistence.csproj migrations add Init
+
+dotnet ef --startup-project WM.API.csproj --project ../WM.Persistence/WM.Persistence.csproj database update  
