@@ -20,8 +20,4 @@
     <ProjectReference Include="..\WM.Persistence\WM.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ControllersV1\" />
-  </ItemGroup>
-
 </Project>

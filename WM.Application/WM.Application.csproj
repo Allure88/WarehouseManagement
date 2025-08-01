@@ -7,16 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases_CQRS\Balances\Commands\" />
-    <Folder Include="UseCases_CQRS\Balances\Queries\" />
-    <Folder Include="UseCases_CQRS\Clients\Commands\" />
-    <Folder Include="UseCases_CQRS\Clients\Queries\" />
-    <Folder Include="UseCases_CQRS\Movements\Documents\Commands\" />
-    <Folder Include="UseCases_CQRS\Movements\Documents\Queries\" />
     <Folder Include="UseCases_CQRS\Movements\Resources\Commands\" />
     <Folder Include="UseCases_CQRS\Movements\Resources\Queries\" />
-    <Folder Include="UseCases_CQRS\Resources\Commands\" />
-    <Folder Include="UseCases_CQRS\Resources\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

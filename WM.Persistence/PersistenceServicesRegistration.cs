@@ -19,11 +19,11 @@ public static class PersistenceServicesRegistration
             //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);  
         });
 
-        services.AddScoped<IUnitsRepository, UnitsRepository>();
-        services.AddScoped<IStateRepository, StateRepository>();
-        services.AddScoped<IResourceRepository, ResourceRepository>();
-        services.AddScoped<IClientRepository, ClientRepository>();
-        services.AddScoped<IBalanceRepository, BalanceRepository>();
+        services.AddScoped<IUnitsRepository, UnitsRepository>(); //
+        services.AddScoped<IStateRepository, StateRepository>(); //
+        services.AddScoped<IResourceRepository, ResourceRepository>(); //
+        services.AddScoped<IClientRepository, ClientRepository>();//
+        services.AddScoped<IBalanceRepository, BalanceRepository>();//
         services.AddScoped<IAdmissionDocRepository, AdmissionDocRepository>();
         services.AddScoped<IAdmissionResRepository, AdmissionResRepository>();
         services.AddScoped<IShippingDocRepository, ShippingDocRepository>();
