@@ -5,7 +5,7 @@ using WM.API.Models;
 using WM.API.Utils;
 using WM.Application.Bodies;
 using WM.Application.UseCases_CQRS.Movements.Documents.Commands;
-using WM.Application.UseCases_CQRS.Movements.Documents.Queries;
+using WM.Application.UseCases_CQRS.Movements.Resources.Queries;
 
 namespace WM.API.ControllersV1;
 

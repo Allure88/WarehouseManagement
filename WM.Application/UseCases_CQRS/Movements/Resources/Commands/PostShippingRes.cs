@@ -4,21 +4,21 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Clients.Validators;
+using WM.Application.UseCases_CQRS.Movements.Resources.Validators;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Clients.Commands;
-
-public class PostClientRequest(ClientBody body) : IRequest<BaseCommandResponse>
+namespace WM.Application.UseCases_CQRS.Movements.Resources.Commands;
+public class PostShippingResRequest(MovementResBody body) : IRequest<BaseCommandResponse>
 {
-    public ClientBody Body { get; set; } = body;
+    public MovementResBody Body { get; set; } = body;
 }
 
-public class PostClientRequestHandler(IClientRepository repository, IMapper mapper) : IRequestHandler<PostClientRequest, BaseCommandResponse>
+public class PostShippingResRequestHandler(IShippingResRepository repository, IMapper mapper) : IRequestHandler<PostShippingResRequest, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostClientRequest request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(PostShippingResRequest request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostClientValidator();
+        var validator = new PostMovementResValidator();
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
