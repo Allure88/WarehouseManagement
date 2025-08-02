@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Balances.Validators;
-using WM.Application.UseCases_CQRS.Clients.Validators;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Balances.Commands;

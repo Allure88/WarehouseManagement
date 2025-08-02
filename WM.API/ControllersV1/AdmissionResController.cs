@@ -1,10 +1,11 @@
 ﻿using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using WM.API.Models;
 using WM.API.Utils;
 using WM.Application.Bodies;
-using WM.Application.UseCases_CQRS.Movements.Documents.Commands;
+using WM.Application.UseCases_CQRS.Movements.Resources.Commands;
 using WM.Application.UseCases_CQRS.Movements.Resources.Queries;
 
 namespace WM.API.ControllersV1;
@@ -13,7 +14,7 @@ namespace WM.API.ControllersV1;
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1")]
 [ApiController]
-public class AdmissionRessController(IMediator mediator) : ControllerBase
+public class AdmissionRessController(IMediator mediator, ILogger<AdmissionRessController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
@@ -28,11 +29,10 @@ public class AdmissionRessController(IMediator mediator) : ControllerBase
         }
         catch (Exception ex)
         {
-            string messageToUser = "";
+            logger.LogError(ex.ToString());
             BaseResponse baseResponse = new(new { ex.Message })
             {
-                Code = System.Net.HttpStatusCode.InternalServerError,
-                Message = messageToUser,
+                Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
             return baseResponse.ToActionResult(this);
@@ -47,20 +47,21 @@ public class AdmissionRessController(IMediator mediator) : ControllerBase
         {
             var command = await _mediator.Send(new PostAdmissionResRequest(inputBody));
 
-            BaseResponse response = new(command.Entity)
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
             {
-                Success = true,
-                Code = System.Net.HttpStatusCode.OK
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
             };
             return response.ToActionResult(this);
         }
         catch (Exception ex)
         {
-            string messageToUser = "";
+            logger.LogError(ex.ToString());
             BaseResponse baseResponse = new(new { ex.Message })
             {
-                Code = System.Net.HttpStatusCode.InternalServerError,
-                Message = messageToUser,
+                Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
             return baseResponse.ToActionResult(this);
