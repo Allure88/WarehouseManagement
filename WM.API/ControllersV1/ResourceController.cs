@@ -5,6 +5,7 @@ using System.Net;
 using WM.API.Models;
 using WM.API.Utils;
 using WM.Application.Bodies;
+using WM.Application.UseCases_CQRS.Clients.Commands;
 using WM.Application.UseCases_CQRS.Resources.Commands;
 using WM.Application.UseCases_CQRS.Resources.Queries;
 
@@ -53,6 +54,35 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Success = command.Success,
                 Code = code,
                 Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("delete")]
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromBody] ResourceBody inputBody)
+    {
+        try
+        {
+            var commandResponce = await _mediator.Send(new DeleteResourceCommand(inputBody));
+
+            HttpStatusCode code = commandResponce.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = commandResponce.Success,
+                Code = code,
+                Errors = commandResponce.Errors
             };
             return response.ToActionResult(this);
         }

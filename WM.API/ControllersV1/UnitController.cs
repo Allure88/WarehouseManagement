@@ -14,7 +14,7 @@ namespace WM.API.ControllersV1;
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1")]
 [ApiController]
-public class UnitsController(IMediator mediator,ILogger<UnitsController>logger) : ControllerBase
+public class UnitsController(IMediator mediator, ILogger<UnitsController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
@@ -53,6 +53,35 @@ public class UnitsController(IMediator mediator,ILogger<UnitsController>logger) 
                 Success = command.Success,
                 Code = code,
                 Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("delete")]
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromBody] UnitBody inputBody)
+    {
+        try
+        {
+            var commandResponce = await _mediator.Send(new DeleteUnitCommand(inputBody));
+
+            HttpStatusCode code = commandResponce.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = commandResponce.Success,
+                Code = code,
+                Errors = commandResponce.Errors
             };
             return response.ToActionResult(this);
         }

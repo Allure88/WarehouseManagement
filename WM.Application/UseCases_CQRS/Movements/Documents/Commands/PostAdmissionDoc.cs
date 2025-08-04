@@ -13,7 +13,7 @@ public class PostAdmissionDocRequest(AdmissionDocBody body) : IRequest<BaseComma
 }
 
 
-public class PostAdmissionDocRequestHandler(IAdmissionDocRepository repository, IMapper mapper) : IRequestHandler<PostAdmissionDocRequest, BaseCommandResponse>
+public class PostAdmissionDocRequestHandler(IAdmissionDocRepository repository, IBalanceRepository balanceRepository, IMapper mapper) : IRequestHandler<PostAdmissionDocRequest, BaseCommandResponse>
 {
     public async Task<BaseCommandResponse> Handle(PostAdmissionDocRequest request, CancellationToken cancellationToken)
     {
@@ -24,15 +24,40 @@ public class PostAdmissionDocRequestHandler(IAdmissionDocRepository repository, 
         if (validationResult.IsValid == false)
         {
             response.Success = false;
-            response.Message = "Баланс не изменен";
+            response.Message = "Документ не сохранен";
             response.Errors = [.. validationResult.Errors.Select(q => q.ErrorMessage)];
         }
         else
         {
             var entity = mapper.Map<AdmissionDocEntity>(request.Body);
+            if (entity.AdmissionRes != null)
+            {
+                var balances = await balanceRepository.GetAll();
+
+                var balance = balances.FirstOrDefault(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
+                b.Resource.Name == entity.AdmissionRes.Resource.Name);
+
+                if (balance == null)
+                {
+                    balance = new()
+                    {
+                        Resource = entity.AdmissionRes.Resource,
+                        UnitOfMeasurement = entity.AdmissionRes.UnitOfMeasurement,
+                        Quantity = entity.AdmissionRes.Quantity
+                    };
+                    await balanceRepository.Add(balance);
+                }
+                else
+                {
+                    balance.Quantity += entity.AdmissionRes.Quantity;
+                    await balanceRepository.Update(balance);
+                }
+            }
             var addedEntity = await repository.Add(entity);
+
+
             response.Success = true;
-            response.Message = "Баланс изменен успешно";
+            response.Message = "Документ сохранен успешно";
         }
 
         return response;

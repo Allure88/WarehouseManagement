@@ -8,4 +8,7 @@ public class ShippingResEntity: BaseEntity
     public long UnitOfMeasurementId {  get; set; }
     public UnitEntity UnitOfMeasurement { get; set; } = null!;
     public float Quantity {  get; set; }
+
+
+  
 }

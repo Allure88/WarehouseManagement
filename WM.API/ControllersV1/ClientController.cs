@@ -45,7 +45,7 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
     {
         try
         {
-            var command = await _mediator.Send(new PostClientRequest(inputBody));
+            var command = await _mediator.Send(new PostClientCommand(inputBody));
 
             HttpStatusCode code = command.Success? HttpStatusCode.OK: HttpStatusCode.BadRequest;
             BaseResponse response = new(null)
@@ -53,6 +53,36 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
                 Success = command.Success,
                 Code = code,
                 Errors = command.Errors                
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
+    [Route("delete")]
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromBody] ClientBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new DeleteClientCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
             };
             return response.ToActionResult(this);
         }

@@ -8,6 +8,13 @@ public class AdmissionDocRepository(WmDbContext dbContext) : GenericRepository<A
 {
     public async Task<AdmissionDocEntity?> GetByNumber(string number)
     {
-        return await _dbContext.AdmissionDocs.Where(c => c.Number == number).FirstOrDefaultAsync();
+        return await _dbContext.AdmissionDocs
+            .Where(d => d.Number == number)
+            .Include(d=>d.AdmissionRes)
+            .ThenInclude(ar => ar.UnitOfMeasurement)
+            .Include(d => d.AdmissionRes)
+            .ThenInclude(ar => ar.Resource)
+            .ThenInclude(r=>r.Balances)
+            .FirstOrDefaultAsync();
     }
 }

@@ -76,14 +76,21 @@ public class WmDbContext : DbContext
           .HasOne(b => b.Resource)
           .WithMany(r => r.Balances)
           .HasForeignKey(c => c.ResourceId)
-          .OnDelete(DeleteBehavior.Restrict)
+          .OnDelete(DeleteBehavior.Cascade)
           .IsRequired();
 
         modelBuilder.Entity<BalanceEntity>()
             .HasOne(b => b.UnitOfMeasurement)
             .WithMany(u => u.Balances)
             .HasForeignKey(c => c.UnitOfMeasurementId)
-            .OnDelete(DeleteBehavior.Restrict)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired();
+
+        modelBuilder.Entity<ShippingDocEntity>()
+         .HasOne(d => d.Client)
+         .WithMany(c => c.ShippingDocuments)
+         .HasForeignKey(c => c.ClientId)
+         .OnDelete(DeleteBehavior.Restrict)
+         .IsRequired();
     }
 }

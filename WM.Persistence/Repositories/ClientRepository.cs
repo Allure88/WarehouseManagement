@@ -10,4 +10,12 @@ public class ClientRepository(WmDbContext dbContext) : GenericRepository<ClientE
     {
         return await _dbContext.Clients.Where(c => c.Name == name).FirstOrDefaultAsync();
     }
+
+    public async Task<ClientEntity?> GetByNameWithDependents(string name)
+    {
+        return await _dbContext.Clients
+            .Where(c => c.Name == name)
+            .Include(c=>c.ShippingDocuments)
+            .FirstOrDefaultAsync();
+    }
 }

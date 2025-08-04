@@ -10,7 +10,6 @@ public class PostShippingDocValidator:AbstractValidator<ShippingDocBody>
 	public PostShippingDocValidator(IShippingDocRepository repository)
 	{
         RuleFor(d => d.ResBody)
-            .NotEmpty().WithMessage("{ProperyName} не должно быть пуcтым")
             .NotNull()
             .Must((resourceMovmn) =>
             {

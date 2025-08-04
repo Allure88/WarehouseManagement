@@ -5,4 +5,5 @@ namespace WM.Application.Contracts;
 public interface IClientRepository : IGenericRepository<ClientEntity>
 {
     Task<ClientEntity?> GetByName(string name);
+    Task<ClientEntity?> GetByNameWithDependents(string name);
 }
