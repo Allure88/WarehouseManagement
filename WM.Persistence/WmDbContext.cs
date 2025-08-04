@@ -33,8 +33,8 @@ public class WmDbContext : DbContext
         modelBuilder.Entity<ResourceEntity>()
              .HasIndex(e => e.Name).IsUnique();
 
-        modelBuilder.Entity<BalanceEntity>()
-          .HasAlternateKey(e => new { e.Resource, e.UnitOfMeasurement });
+        //modelBuilder.Entity<BalanceEntity>()
+        //  .HasAlternateKey(e => new { e.Resource, e.UnitOfMeasurement });
 
         modelBuilder.Entity<AdmissionDocEntity>()
            .HasAlternateKey(e => e.Number);

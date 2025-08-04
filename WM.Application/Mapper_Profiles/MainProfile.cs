@@ -9,7 +9,7 @@ public class MainProfile : Profile
     public MainProfile()
     {
         CreateMap<UnitBody, UnitEntity>();
-        CreateMap<StateBody, ShippingDocEntity>();
+        CreateMap<ShippingDocBody, ShippingDocEntity>();
         CreateMap<ResourceBody, ResourceEntity>();
         CreateMap<ClientBody, ClientEntity>();
         CreateMap<BalanceBody, BalanceEntity>();
