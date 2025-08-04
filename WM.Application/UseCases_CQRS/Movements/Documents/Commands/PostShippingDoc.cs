@@ -18,7 +18,7 @@ public class PostShippingDocRequestHandler(IShippingDocRepository repository, IM
     public async Task<BaseCommandResponse> Handle(PostShippingDocRequest request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostShippingDocValidator();
+        var validator = new PostShippingDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

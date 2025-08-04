@@ -1,10 +1,8 @@
-﻿using WM.Domain.Entities;
+﻿namespace WM.Application.Bodies;
 
-namespace WM.Application.Bodies
+public class AdmissionDocBody
 {
-    public class AdmissionDocBody
-    {
-        public string Number { get; set; }
-        public DateTime Date { get; set; }
-    }
+    public string Number { get; set; } = string.Empty;
+    public DateTime Date { get; set; }
+    public AdmissionResBody ResBody { get; set; } = null!;
 }

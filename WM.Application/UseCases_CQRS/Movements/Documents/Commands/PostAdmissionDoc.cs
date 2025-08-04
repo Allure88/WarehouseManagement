@@ -18,7 +18,7 @@ public class PostAdmissionDocRequestHandler(IAdmissionDocRepository repository, 
     public async Task<BaseCommandResponse> Handle(PostAdmissionDocRequest request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostAdmissionDocValidator();
+        var validator = new PostAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

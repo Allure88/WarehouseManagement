@@ -33,6 +33,12 @@ public class GenericRepository<T>(WmDbContext dbContext) : IGenericRepository<T>
         }
     }
 
+    public async Task<bool> Exists(long id)
+    {
+        var entity = await Get(id);
+        return entity != null;
+    }
+
     public virtual async Task<T?> Get(long id)
     {
         return await _dbContext.Set<T>().FindAsync(id);

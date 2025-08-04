@@ -2,7 +2,7 @@
 
 public class ClientEntity : BaseEntity
 {
-    public string Name { get; set; }
-    public string Adress { get; set; }
-    public StateEntity State { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Adress { get; set; } = string.Empty;
+    public State State { get; set; }
 }

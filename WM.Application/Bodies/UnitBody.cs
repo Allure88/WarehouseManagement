@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WM.Domain.Entities;
+﻿using WM.Domain.Entities;
 
-namespace WM.Application.Bodies
+namespace WM.Application.Bodies;
+
+public class UnitBody
 {
-    public class UnitBody
-    {
-        public string UnitDescription { get; set; } = string.Empty;
-        public StateBody State { get; set; }
-    }
+    public string UnitDescription { get; set; } = string.Empty;
+    public State State { get; set; }
 }

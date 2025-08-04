@@ -19,7 +19,7 @@ public class PostResourceRequestHandler(IResourceRepository repository, IMapper 
     public async Task<BaseCommandResponse> Handle(PostResourceRequest request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostResourceValidator();
+        var validator = new PostResourceValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

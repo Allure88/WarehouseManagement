@@ -20,7 +20,6 @@ public static class PersistenceServicesRegistration
         });
 
         services.AddScoped<IUnitsRepository, UnitsRepository>(); //
-        services.AddScoped<IStateRepository, StateRepository>(); //
         services.AddScoped<IResourceRepository, ResourceRepository>(); //
         services.AddScoped<IClientRepository, ClientRepository>();//
         services.AddScoped<IBalanceRepository, BalanceRepository>();//

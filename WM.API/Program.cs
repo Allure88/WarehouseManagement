@@ -75,15 +75,16 @@ public class Program
 
         #endregion
 
-        //TODO Cors
-        string corsWarning; //оставлена, чтобы висела в предупреждениях
+        builder.Services.AddCors(options =>
+                 options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
+             );
 
         builder.Services.ConfigureApplicationServices();
         builder.Services.ConfigurePersistenceServices(builder.Configuration);
 
         var app = builder.Build();
 
-
+        app.UseCors("AllowAll");
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
