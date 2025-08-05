@@ -8,19 +8,19 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Resources.Commands;
 
-public class PostResourceCommand(ResourceBody body) : IRequest<BaseCommandResponse>
+public class UpdateResourceCommand(ResourceBody body) : IRequest<BaseCommandResponse>
 {
     public ResourceBody Body { get; set; } = body;
 }
 
 
-public class PostResourceCommandHandler(IResourceRepository repository, IMapper mapper) : IRequestHandler<PostResourceCommand, BaseCommandResponse>
+public class UpdateResourceCommandHandler(IResourceRepository repository, IMapper mapper) : IRequestHandler<UpdateResourceCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostResourceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(UpdateResourceCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostResourceValidator(repository);
-        var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
+        var validator = new UpdateResourceValidator(repository);
+        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
         {
@@ -30,8 +30,8 @@ public class PostResourceCommandHandler(IResourceRepository repository, IMapper 
         }
         else
         {
-            var entity = mapper.Map<ResourceEntity>(request.Body);
-            var addedEntity = await repository.Add(entity);
+            var entity = mapper.Map<ResourceEntity>(command.Body);
+            await repository.Update(entity);
             response.Success = true;
             response.Message = "Ресурс добавлен успешно";
         }
@@ -39,5 +39,3 @@ public class PostResourceCommandHandler(IResourceRepository repository, IMapper 
         return response;
     }
 }
-
-

@@ -68,6 +68,35 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
         }
     }
 
+    [Route("update")]
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] ClientBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new UpdateClientCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
 
     [Route("delete")]
     [HttpDelete]

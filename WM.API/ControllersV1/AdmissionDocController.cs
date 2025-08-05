@@ -5,6 +5,7 @@ using System.Net;
 using WM.API.Models;
 using WM.API.Utils;
 using WM.Application.Bodies;
+using WM.Application.UseCases_CQRS.Clients.Commands;
 using WM.Application.UseCases_CQRS.Movements.Documents.Commands;
 using WM.Application.UseCases_CQRS.Movements.Documents.Queries;
 
@@ -46,6 +47,35 @@ public class AdmissionDocsController(IMediator mediator, ILogger<AdmissionDocsCo
         try
         {
             var command = await _mediator.Send(new PostAdmissionDocRequest(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("delete")]
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromBody] AdmissionDocBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new DeleteAdmissionDocCommand(inputBody));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)

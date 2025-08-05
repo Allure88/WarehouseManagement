@@ -45,7 +45,37 @@ public class UnitsController(IMediator mediator, ILogger<UnitsController> logger
     {
         try
         {
-            var command = await _mediator.Send(new PostUnitRequest(inputBody));
+            var command = await _mediator.Send(new PostUnitCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
+    [Route("update")]
+    [HttpPost]
+    public async Task<ActionResult> Update([FromBody] UnitBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new UpdateUnitCommand(inputBody));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)

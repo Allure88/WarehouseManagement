@@ -46,7 +46,37 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
     {
         try
         {
-            var command = await _mediator.Send(new PostResourceRequest(inputBody));
+            var command = await _mediator.Send(new PostResourceCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
+    [Route("update")]
+    [HttpPost]
+    public async Task<ActionResult> Update([FromBody] ResourceBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new UpdateResourceCommand(inputBody));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)

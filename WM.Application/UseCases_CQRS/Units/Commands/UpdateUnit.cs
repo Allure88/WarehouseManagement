@@ -8,17 +8,17 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Units.Commands;
 
-public class PostUnitCommand(UnitBody body) : IRequest<BaseCommandResponse>
+public class UpdateUnitCommand(UnitBody body) : IRequest<BaseCommandResponse>
 {
     public UnitBody Body { get; set; } = body;
 }
 
-public class PostUnitRequestHandler(IUnitsRepository repository, IMapper mapper) : IRequestHandler<PostUnitCommand, BaseCommandResponse>
+public class UpdateUnitRequestHandler(IUnitsRepository repository, IMapper mapper) : IRequestHandler<UpdateUnitCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostUnitCommand request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(UpdateUnitCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostUnitValidator(repository);
+        var validator = new UpdateUnitValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -30,7 +30,7 @@ public class PostUnitRequestHandler(IUnitsRepository repository, IMapper mapper)
         else
         {
             var entity = mapper.Map<UnitEntity>(request.Body);
-            var addedEntity = await repository.Add(entity);
+            await repository.Update(entity);
             response.Success = true;
             response.Message = "Единица измерения добавлена успешно";
         }
@@ -38,5 +38,3 @@ public class PostUnitRequestHandler(IUnitsRepository repository, IMapper mapper)
         return response;
     }
 }
-
-

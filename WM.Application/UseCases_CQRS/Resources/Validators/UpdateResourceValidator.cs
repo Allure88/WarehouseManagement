@@ -4,16 +4,16 @@ using WM.Application.Contracts;
 
 namespace WM.Application.UseCases_CQRS.Resources.Validators;
 
-public class PostResourceValidator:AbstractValidator<ResourceBody>
+public class UpdateResourceValidator : AbstractValidator<ResourceBody>
 {
-	public PostResourceValidator(IResourceRepository repository)
-	{
+    public UpdateResourceValidator(IResourceRepository repository)
+    {
         RuleFor(c => c.Name)
              .MustAsync(async (name, token) =>
              {
-                 return await repository.GetByName(name) is null;
+                 return await repository.GetByName(name) is not null;
              })
-            .WithMessage("Ресурс с наименованием {ComparisonValue} создана ранее.")
+            .WithMessage("Ресурс с наименованием {ComparisonValue} не существует.")
            .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
            .NotNull()
            .MaximumLength(50).WithMessage("{ProperyName} максимальная длина 50 символов");
@@ -22,6 +22,8 @@ public class PostResourceValidator:AbstractValidator<ResourceBody>
                 .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
                 .NotNull();
     }
+
+
 
 }
 
