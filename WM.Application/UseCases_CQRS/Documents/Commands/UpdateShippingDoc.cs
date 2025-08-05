@@ -3,21 +3,24 @@ using MediatR;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
-using WM.Application.UseCases_CQRS.Movements.Resources.Validators;
+using WM.Application.UseCases_CQRS.Documents.Validators;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Movements.Resources.Commands;
-public class PostShippingResRequest(ShippingResBody body) : IRequest<BaseCommandResponse>
+namespace WM.Application.UseCases_CQRS.Documents.Commands;
+
+public class UpdateShippingDocCommand(ShippingDocBody body) : IRequest<BaseCommandResponse>
 {
-    public ShippingResBody Body { get; set; } = body;
+    public ShippingDocBody Body { get; set; } = body;
 }
 
-public class PostShippingResRequestHandler(IShippingResRepository repository, IMapper mapper) : IRequestHandler<PostShippingResRequest, BaseCommandResponse>
+
+
+public class UpdateShippingDocCommandHandler(IShippingDocRepository repository, IMapper mapper) : IRequestHandler<UpdateShippingDocCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostShippingResRequest request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(UpdateShippingDocCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostShippingResValidator();
+        var validator = new UpdateShippingDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -28,7 +31,7 @@ public class PostShippingResRequestHandler(IShippingResRepository repository, IM
         }
         else
         {
-            var entity = mapper.Map<ShippingResEntity>(request.Body);
+            var entity = mapper.Map<ShippingDocEntity>(request.Body);
             var addedEntity = await repository.Add(entity);
             response.Success = true;
             response.Message = "Баланс изменен успешно";

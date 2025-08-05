@@ -6,7 +6,7 @@ using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Movements.Documents.Validators;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Commands;
+namespace WM.Application.UseCases_CQRS.Documents.Commands;
 
 public class DeleteAdmissionDocCommand(AdmissionDocBody body) : IRequest<BaseCommandResponse>
 {

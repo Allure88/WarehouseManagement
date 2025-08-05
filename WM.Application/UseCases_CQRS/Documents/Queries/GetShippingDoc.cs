@@ -2,7 +2,7 @@
 using WM.Application.Contracts;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Queries;
+namespace WM.Application.UseCases_CQRS.Documents.Queries;
 
 public class GetShippingDocBodiesListRequest : IRequest<GetShippingDocBodiesListResponse> { }
 

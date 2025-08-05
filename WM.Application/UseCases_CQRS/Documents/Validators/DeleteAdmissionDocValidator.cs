@@ -2,7 +2,7 @@
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class DeleteAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
 {
@@ -14,7 +14,7 @@ public class DeleteAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
                 var admissionDoc = await repository.GetByNumber(name);
                 if (admissionDoc is null)
                 {
-                    context.AddFailure(nameof(name), "Документ с таким именем не существует");
+                    context.AddFailure(nameof(name), "Документ с таким номером не существует");
                 }
                 else
                 {

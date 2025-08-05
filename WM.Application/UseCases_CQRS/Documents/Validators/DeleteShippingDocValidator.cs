@@ -2,7 +2,7 @@
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class DeleteShippingDocValidator : AbstractValidator<ShippingDocBody>
 {

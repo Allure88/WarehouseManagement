@@ -3,7 +3,7 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class PostAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
 {

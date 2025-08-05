@@ -3,12 +3,12 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Domain.Entities;
 
-namespace WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
-public class PostShippingDocValidator:AbstractValidator<ShippingDocBody>
+public class UpdateShippingDocValidator : AbstractValidator<ShippingDocBody>
 {
-	public PostShippingDocValidator(IShippingDocRepository repository)
-	{
+    public UpdateShippingDocValidator(IShippingDocRepository repository)
+    {
         RuleFor(d => d.ResBody)
             .NotNull()
             .Must((resourceMovmn) =>
@@ -19,15 +19,15 @@ public class PostShippingDocValidator:AbstractValidator<ShippingDocBody>
         RuleFor(c => c.Number)
              .MustAsync(async (number, token) =>
              {
-                 return await repository.GetByNumber(number) is null;
+                 return await repository.GetByNumber(number) is not null;
              })
-            .WithMessage("Документ с номером {ComparisonValue} создана ранее.")
+            .WithMessage("Документ с номером {ComparisonValue} не существует.")
          .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
          .NotNull()
          .MaximumLength(50).WithMessage("{ProperyName} максимальная длина 50 символов");
 
         RuleFor(c => c.State)
-            .Must((state)=> state != State.Active).WithMessage("Невозможно создать архивный документ")
+            .Must((state) => state != State.Active).WithMessage("Невозможно создать архивный документ")
             .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
             .NotNull();
 
@@ -41,3 +41,4 @@ public class PostShippingDocValidator:AbstractValidator<ShippingDocBody>
 
     }
 }
+
