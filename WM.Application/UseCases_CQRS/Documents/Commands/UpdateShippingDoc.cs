@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Documents.Validators;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;
 
@@ -31,8 +30,9 @@ public class UpdateShippingDocCommandHandler(IShippingDocRepository repository, 
         }
         else
         {
-            var entity = mapper.Map<ShippingDocEntity>(request.Body);
-            var addedEntity = await repository.Add(entity);
+            var entity = validator.ShippingDocEntity!;
+            entity = mapper.Map(request.Body, entity);
+            await repository.Update(entity);
             response.Success = true;
             response.Message = "Баланс изменен успешно";
         }

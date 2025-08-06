@@ -8,18 +8,18 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Resources.Commands;
 
-public class PostResourceCommand(ResourceBody body) : IRequest<BaseCommandResponse>
+public class CreateResourceCommand(ResourceBody body) : IRequest<BaseCommandResponse>
 {
     public ResourceBody Body { get; set; } = body;
 }
 
 
-public class PostResourceCommandHandler(IResourceRepository repository, IMapper mapper) : IRequestHandler<PostResourceCommand, BaseCommandResponse>
+public class CreateResourceCommandHandler(IResourceRepository repository, IMapper mapper) : IRequestHandler<CreateResourceCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostResourceCommand request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(CreateResourceCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostResourceValidator(repository);
+        var validator = new CreateResourceValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

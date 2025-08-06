@@ -2,4 +2,4 @@
 
 public enum State { Active, Archived }
 
-public enum DocumentStatus { Created, Approved, Withdrawn }
+public enum DocumentStatus { Created, Approved, Revocated }

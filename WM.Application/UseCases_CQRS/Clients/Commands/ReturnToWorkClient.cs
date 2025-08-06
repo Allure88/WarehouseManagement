@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
@@ -8,19 +7,19 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Clients.Commands;
 
-public class UpdateClientCommand(ClientBody body) : IRequest<BaseCommandResponse>
+public class ReturnToWorkClientCommand(ClientBody body) : IRequest<BaseCommandResponse>
 {
     public ClientBody Body { get; set; } = body;
 }
 
 
 
-public class UpdateClientRequestHandler(IClientRepository repository, IMapper mapper) : IRequestHandler<UpdateClientCommand, BaseCommandResponse>
+public class ReturnToWorkClientRequestHandler(IClientRepository repository) : IRequestHandler<ArchiveClientCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(UpdateClientCommand command, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(ArchiveClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new UpdateClientValidator(repository);
+        var validator = new ReturnToWorkClientValidator(repository);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -31,13 +30,12 @@ public class UpdateClientRequestHandler(IClientRepository repository, IMapper ma
         }
         else
         {
-            var entity = mapper.Map<ClientEntity>(command.Body);
+            ClientEntity entity = validator.Client!;
+            entity.State = State.Active;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Клиент обновлен успешно";
         }
-
         return response;
     }
 }
-

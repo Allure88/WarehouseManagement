@@ -7,38 +7,54 @@ namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class UpdateShippingDocValidator : AbstractValidator<ShippingDocBody>
 {
+    public ShippingDocEntity? ShippingDocEntity { get; private set; }
+
     public UpdateShippingDocValidator(IShippingDocRepository repository)
     {
-        RuleFor(d => d.ResBody)
-            .NotNull()
-            .Must((resourceMovmn) =>
+        RuleFor(c => c)
+            .Custom(async (docBody, context) =>
             {
-                return resourceMovmn.Resource.State != State.Archived;
-            }).WithMessage("Архивный ресурс невозможно выбрать");
+                ShippingDocEntity = await repository.GetByNumber(docBody.Number);
+                if (ShippingDocEntity is null)
+                {
+                    context.AddFailure(nameof(docBody.Number), "Документ с таким номером не существует");
+                }
+                else
+                {
+                    if (docBody.Date > ShippingDocEntity.Date)
+                    {
+                        context.AddFailure("Нельзя изменить дату документа на предыдущую");
+                    }
 
-        RuleFor(c => c.Number)
-             .MustAsync(async (number, token) =>
-             {
-                 return await repository.GetByNumber(number) is not null;
-             })
-            .WithMessage("Документ с номером {ComparisonValue} не существует.")
-         .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
-         .NotNull()
-         .MaximumLength(50).WithMessage("{ProperyName} максимальная длина 50 символов");
+                    var resMvmn = ShippingDocEntity.ShippingRes;
 
-        RuleFor(c => c.State)
-            .Must((state) => state != State.Active).WithMessage("Невозможно создать архивный документ")
-            .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
-            .NotNull();
+                    if (resMvmn is not null)
+                    {
+                        bool restrict = false;
+                        //с составом движения ресурса
+                        ShippingResBody newAdmissionResource = docBody.ResBody;
+                        if (newAdmissionResource.UnitOfMeasurement.UnitDescription != resMvmn.UnitOfMeasurement.Name
+                        || newAdmissionResource.Resource.Name != resMvmn.Resource.Name)
+                        {
+                            restrict = true;
+                            context.AddFailure("Разрешено изменять только количество. Изменение состава раесурса через удаление.");
+                        }
+                        if (!restrict)
+                        {
+                            //с архивным атрибутом
+                            if (resMvmn.Resource.State != newAdmissionResource.Resource.State)
+                            {
+                                context.AddFailure("Разрешено изменять только количество. Изменения архива ресурса в разделе Ресурсы.");
+                            }
 
-        RuleFor(c => c.Client)
-            .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
-            .NotNull();
-
-        RuleFor(c => c.Date)
-            .NotNull().WithMessage("{ProperyName} не должно быть путым")
-            .GreaterThan(DateTime.Now).WithMessage("Нельзя использовать предыдущую дату");
-
+                            if (ShippingDocEntity.Client.State != docBody.Client.State)
+                            {
+                                context.AddFailure("Разрешено изменять только количество. Изменения архива клиентов в разделе Клиенты.");
+                            }
+                        }
+                    }
+                }
+            });
     }
 }
 

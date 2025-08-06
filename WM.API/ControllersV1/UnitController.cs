@@ -45,7 +45,7 @@ public class UnitsController(IMediator mediator, ILogger<UnitsController> logger
     {
         try
         {
-            var command = await _mediator.Send(new PostUnitCommand(inputBody));
+            var command = await _mediator.Send(new CreateUnitCommand(inputBody));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)
@@ -70,12 +70,72 @@ public class UnitsController(IMediator mediator, ILogger<UnitsController> logger
 
 
     [Route("update")]
-    [HttpPost]
+    [HttpPut]
     public async Task<ActionResult> Update([FromBody] UnitBody inputBody)
     {
         try
         {
             var command = await _mediator.Send(new UpdateUnitCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
+
+    [Route("returntowork")]
+    [HttpPut]
+    public async Task<ActionResult> ReturnToWork([FromBody] UnitBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new ReturnToWorkUnitCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("archive")]
+    [HttpPost]
+    public async Task<ActionResult> Archive([FromBody] UnitBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new ArchiveUnitCommand(inputBody));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)

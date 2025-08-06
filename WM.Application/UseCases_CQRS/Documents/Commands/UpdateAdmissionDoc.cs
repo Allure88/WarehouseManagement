@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Documents.Validators;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;
 
@@ -19,7 +18,7 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
     {
         var newQuantity = command.Body.ResBody.Quantity;
         var response = new BaseCommandResponse();
-        var validator = new UpdateAdmissionDocValidator(repository, newQuantity);
+        var validator = new UpdateAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -30,7 +29,8 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
         }
         else
         {
-            var entity = mapper.Map<AdmissionDocEntity>(command.Body);
+            var entity = validator.AdmissionDocEntity!;
+            entity = mapper.Map(command.Body, entity);
             if (entity.AdmissionRes != null)
             {
                 var balances = await balanceRepository.GetAll();
@@ -54,7 +54,7 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
                     await balanceRepository.Update(balance);
                 }
             }
-            var addedEntity = await repository.Add(entity);
+            await repository.Update(entity);
 
 
             response.Success = true;
@@ -64,3 +64,4 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
         return response;
     }
 }
+

@@ -6,7 +6,7 @@ using WM.API.Models;
 using WM.API.Utils;
 using WM.Application.Bodies;
 using WM.Application.UseCases_CQRS.Documents.Queries;
-using WM.Application.UseCases_CQRS.Movements.Documents.Commands;
+using WM.Application.UseCases_CQRS.Documents.Commands;
 
 namespace WM.API.ControllersV1;
 
@@ -45,7 +45,95 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
     {
         try
         {
-            var command = await _mediator.Send(new PostShippingDocRequest(inputBody));
+            var command = await _mediator.Send(new CreateShippingDocRequest(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
+    [Route("update")]
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] ShippingDocBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new UpdateShippingDocCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("sign")]
+    [HttpPut]
+    public async Task<ActionResult> Update(string number)
+    {
+        try
+        {
+            var command = await _mediator.Send(new SignShippingDocCommand(number));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("revocate")]
+    [HttpPut]
+    public async Task<ActionResult> Revocate(string number)
+    {
+        try
+        {
+            var command = await _mediator.Send(new RevocateShippingDocCommand(number));
 
             HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)

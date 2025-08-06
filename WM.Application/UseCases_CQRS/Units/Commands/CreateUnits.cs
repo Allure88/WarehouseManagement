@@ -8,14 +8,14 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Units.Commands;
 
-public class PostUnitCommand(UnitBody body) : IRequest<BaseCommandResponse>
+public class CreateUnitCommand(UnitBody body) : IRequest<BaseCommandResponse>
 {
     public UnitBody Body { get; set; } = body;
 }
 
-public class PostUnitRequestHandler(IUnitsRepository repository, IMapper mapper) : IRequestHandler<PostUnitCommand, BaseCommandResponse>
+public class CreateUnitCommandHandler(IUnitsRepository repository, IMapper mapper) : IRequestHandler<CreateUnitCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostUnitCommand request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
         var validator = new PostUnitValidator(repository);
@@ -24,7 +24,7 @@ public class PostUnitRequestHandler(IUnitsRepository repository, IMapper mapper)
         if (validationResult.IsValid == false)
         {
             response.Success = false;
-            response.Message = "Единицп измерения не добавлена";
+            response.Message = "Единица измерения не добавлена";
             response.Errors = [.. validationResult.Errors.Select(q => q.ErrorMessage)];
         }
         else

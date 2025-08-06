@@ -4,9 +4,9 @@ using WM.Application.Contracts;
 
 namespace WM.Application.UseCases_CQRS.Resources.Validators;
 
-public class PostResourceValidator:AbstractValidator<ResourceBody>
+public class CreateResourceValidator:AbstractValidator<ResourceBody>
 {
-	public PostResourceValidator(IResourceRepository repository)
+	public CreateResourceValidator(IResourceRepository repository)
 	{
         RuleFor(c => c.Name)
              .MustAsync(async (name, token) =>

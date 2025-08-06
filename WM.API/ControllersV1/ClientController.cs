@@ -98,6 +98,65 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
     }
 
 
+    [Route("archive")]
+    [HttpPut]
+    public async Task<ActionResult> Archive([FromBody] ClientBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new ArchiveClientCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+    [Route("returntowork")]
+    [HttpPut]
+    public async Task<ActionResult> ReturnToWork([FromBody] ClientBody inputBody)
+    {
+        try
+        {
+            var command = await _mediator.Send(new ReturnToWorkClientCommand(inputBody));
+
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
+            BaseResponse response = new(null)
+            {
+                Success = command.Success,
+                Code = code,
+                Errors = command.Errors
+            };
+            return response.ToActionResult(this);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex.ToString());
+            BaseResponse baseResponse = new(new { ex.Message })
+            {
+                Code = HttpStatusCode.InternalServerError,
+                Success = false
+            };
+            return baseResponse.ToActionResult(this);
+        }
+    }
+
+
     [Route("delete")]
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody] ClientBody inputBody)

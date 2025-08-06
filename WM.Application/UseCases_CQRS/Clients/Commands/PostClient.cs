@@ -19,7 +19,7 @@ public class PostClientRequestHandler(IClientRepository repository, IMapper mapp
     public async Task<BaseCommandResponse> Handle(PostClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostClientValidator(repository);
+        var validator = new CreateClientValidator(repository);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

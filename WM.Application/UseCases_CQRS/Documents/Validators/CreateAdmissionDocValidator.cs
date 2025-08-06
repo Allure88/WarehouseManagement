@@ -5,9 +5,9 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
-public class PostAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
+public class CreateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
 {
-    public PostAdmissionDocValidator(IAdmissionDocRepository repository)
+    public CreateAdmissionDocValidator(IAdmissionDocRepository repository)
     {
         RuleFor(d => d.ResBody)
             .Must((resourceMovmn) =>

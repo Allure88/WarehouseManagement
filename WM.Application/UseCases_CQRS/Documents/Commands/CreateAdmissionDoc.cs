@@ -7,18 +7,18 @@ using WM.Application.UseCases_CQRS.Documents.Validators;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;
-public class PostAdmissionDocRequest(AdmissionDocBody body) : IRequest<BaseCommandResponse>
+public class CreateAdmissionDocCommand(AdmissionDocBody body) : IRequest<BaseCommandResponse>
 {
     public AdmissionDocBody Body { get; set; } = body;
 }
 
 
-public class PostAdmissionDocRequestHandler(IAdmissionDocRepository repository, IBalanceRepository balanceRepository, IMapper mapper) : IRequestHandler<PostAdmissionDocRequest, BaseCommandResponse>
+public class CreateAdmissionDocCommandHandler(IAdmissionDocRepository repository, IBalanceRepository balanceRepository, IMapper mapper) : IRequestHandler<CreateAdmissionDocCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostAdmissionDocRequest request, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(CreateAdmissionDocCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostAdmissionDocValidator(repository);
+        var validator = new CreateAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
