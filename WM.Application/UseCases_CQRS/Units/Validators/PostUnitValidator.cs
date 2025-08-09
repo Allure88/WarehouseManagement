@@ -8,7 +8,7 @@ public class PostUnitValidator : AbstractValidator<UnitBody>
 {
 	public PostUnitValidator(IUnitsRepository repository)
 	{
-        RuleFor(c => c.UnitDescription)
+        RuleFor(c => c.Name)
             .MustAsync(async (name, token) =>
             {
                 return await repository.GetByName(name) is null;

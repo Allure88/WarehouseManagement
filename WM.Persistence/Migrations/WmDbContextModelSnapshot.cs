@@ -30,6 +30,9 @@ namespace WM.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AdmissionResId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
@@ -37,14 +40,11 @@ namespace WM.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long?>("ShippingResId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Number");
 
-                    b.HasIndex("ShippingResId");
+                    b.HasIndex("AdmissionResId");
 
                     b.ToTable("AdmissionDocs");
                 });
@@ -172,7 +172,7 @@ namespace WM.Persistence.Migrations
                     b.Property<long>("ShippingResId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("State")
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -237,11 +237,11 @@ namespace WM.Persistence.Migrations
 
             modelBuilder.Entity("WM.Domain.Entities.AdmissionDocEntity", b =>
                 {
-                    b.HasOne("WM.Domain.Entities.AdmissionResEntity", "ShippingRes")
+                    b.HasOne("WM.Domain.Entities.AdmissionResEntity", "AdmissionRes")
                         .WithMany()
-                        .HasForeignKey("ShippingResId");
+                        .HasForeignKey("AdmissionResId");
 
-                    b.Navigation("ShippingRes");
+                    b.Navigation("AdmissionRes");
                 });
 
             modelBuilder.Entity("WM.Domain.Entities.AdmissionResEntity", b =>
@@ -268,13 +268,13 @@ namespace WM.Persistence.Migrations
                     b.HasOne("WM.Domain.Entities.ResourceEntity", "Resource")
                         .WithMany("Balances")
                         .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WM.Domain.Entities.UnitEntity", "UnitOfMeasurement")
                         .WithMany("Balances")
                         .HasForeignKey("UnitOfMeasurementId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Resource");
@@ -285,9 +285,9 @@ namespace WM.Persistence.Migrations
             modelBuilder.Entity("WM.Domain.Entities.ShippingDocEntity", b =>
                 {
                     b.HasOne("WM.Domain.Entities.ClientEntity", "Client")
-                        .WithMany()
+                        .WithMany("ShippingDocuments")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("WM.Domain.Entities.ShippingResEntity", "ShippingRes")
@@ -318,6 +318,11 @@ namespace WM.Persistence.Migrations
                     b.Navigation("Resource");
 
                     b.Navigation("UnitOfMeasurement");
+                });
+
+            modelBuilder.Entity("WM.Domain.Entities.ClientEntity", b =>
+                {
+                    b.Navigation("ShippingDocuments");
                 });
 
             modelBuilder.Entity("WM.Domain.Entities.ResourceEntity", b =>

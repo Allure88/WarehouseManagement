@@ -18,7 +18,8 @@ public class ArchiveResourceCommandHandler(IResourceRepository repository) : IRe
     public async Task<BaseCommandResponse> Handle(ArchiveResourceCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new ArchiveResourceValidator(repository);
+        var entity = await repository.GetByName(command.Body.Name);
+        var validator = new ArchiveResourceValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -29,8 +30,7 @@ public class ArchiveResourceCommandHandler(IResourceRepository repository) : IRe
         }
         else
         {
-            ResourceEntity entity = validator.Resource!;
-            entity.State = State.Archived;
+            entity!.State = State.Archived;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Ресурс обновлен успешно";

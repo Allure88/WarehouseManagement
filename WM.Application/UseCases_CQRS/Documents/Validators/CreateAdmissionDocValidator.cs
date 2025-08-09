@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
+using WM.Application.Mapper_Profiles;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Validators;
@@ -12,7 +13,7 @@ public class CreateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
         RuleFor(d => d.ResBody)
             .Must((resourceMovmn) =>
             {
-                return resourceMovmn.Resource.State != State.Archived;
+                return resourceMovmn.Resource.State.ConvertToState() != State.Archived;
             }).WithMessage("Архивный ресурс невозможно выбрать");
 
 
@@ -28,7 +29,7 @@ public class CreateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
 
         RuleFor(c => c.Date)
             .NotNull().WithMessage("{ProperyName} не должно быть пуcтым")
-            .GreaterThan(DateTime.Now).WithMessage("Нельзя использовать предыдущую дату");
+            .LessThanOrEqualTo(DateTime.Today).WithMessage("Нельзя использовать предыдущую дату");
     }
 }
 

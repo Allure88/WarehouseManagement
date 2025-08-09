@@ -20,7 +20,8 @@ public class UpdateClientRequestHandler(IClientRepository repository, IMapper ma
     public async Task<BaseCommandResponse> Handle(UpdateClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new UpdateClientValidator(repository);
+        var entity = await repository.GetByNameWithDependents(command.Body.Name);
+        var validator = new UpdateClientValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -31,13 +32,14 @@ public class UpdateClientRequestHandler(IClientRepository repository, IMapper ma
         }
         else
         {
-            var entity = mapper.Map<ClientEntity>(command.Body);
+            entity = mapper.Map(command.Body, entity!);
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Клиент обновлен успешно";
         }
 
         return response;
+
     }
 }
 

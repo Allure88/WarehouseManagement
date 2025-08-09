@@ -1,20 +1,24 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
+using WM.Application.Bodies;
 using WM.Application.Contracts;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Balances.Queries;
 public class GetBalanceBodiesListRequest : IRequest<GetBalanceBodiesListResponse> { }
 
-public class GetBalanceBodiesListResponse(List<BalanceEntity> Balances)
+public class GetBalanceBodiesListResponse(List<BalanceBody> Balances)
 {
-    public List<BalanceEntity> Balances { get; } = Balances;
+    public List<BalanceBody> Balances { get; } = Balances;
 }
 
-public class GetPresetnBodiesListRequestHandler(IBalanceRepository repository) : IRequestHandler<GetBalanceBodiesListRequest, GetBalanceBodiesListResponse>
+public class GetPresetnBodiesListRequestHandler(IBalanceRepository repository, IMapper mapper) : IRequestHandler<GetBalanceBodiesListRequest, GetBalanceBodiesListResponse>
 {
     public async Task<GetBalanceBodiesListResponse> Handle(GetBalanceBodiesListRequest request, CancellationToken cancellationToken)
     {
-        var entities = await repository.GetAll();
-        return new GetBalanceBodiesListResponse(entities);
+        var entities = await repository.GetAllWithDependencies();
+
+        List<BalanceBody> balances = [.. entities.Select(mapper.Map<BalanceBody>)];
+
+        return new GetBalanceBodiesListResponse(balances);
     }
 }

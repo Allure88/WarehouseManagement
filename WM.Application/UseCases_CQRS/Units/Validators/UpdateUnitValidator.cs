@@ -8,7 +8,7 @@ public class UpdateUnitValidator : AbstractValidator<UnitBody>
 {
     public UpdateUnitValidator(IUnitsRepository repository)
     {
-        RuleFor(c => c.UnitDescription)
+        RuleFor(c => c.Name)
             .MustAsync(async (name, token) =>
             {
                 return await repository.GetByName(name) is not null;

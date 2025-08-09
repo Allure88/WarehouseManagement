@@ -18,8 +18,9 @@ public class ArchiveUnitRequestHandler(IUnitsRepository repository) : IRequestHa
     public async Task<BaseCommandResponse> Handle(ArchiveUnitCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new ArchiveUnitValidator(repository);
-        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
+        var entity = await repository.GetByName(command.Body.Name);
+        var validator = new ArchiveUnitValidator(entity);
+        var validationResult = validator.Validate(command.Body);
 
         if (validationResult.IsValid == false)
         {
@@ -29,8 +30,7 @@ public class ArchiveUnitRequestHandler(IUnitsRepository repository) : IRequestHa
         }
         else
         {
-            UnitEntity entity = validator.Unit!;
-            entity.State = State.Archived;
+            entity!.State = State.Archived;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Клиент обновлен успешно";

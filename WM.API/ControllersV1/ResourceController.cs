@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using WM.API.Models;
-using WM.API.Utils;
 using WM.Application.Bodies;
 using WM.Application.UseCases_CQRS.Resources.Commands;
 using WM.Application.UseCases_CQRS.Resources.Queries;
@@ -19,29 +18,30 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult> Get()
+    public async Task<BaseResponse> Get()
     {
         try
         {
             GetResourceBodiesListResponse ResourcesList = await _mediator.Send(new GetResourceBodiesListRequest());
-            BaseResponse response = new(ResourcesList) { Success = true, Code = System.Net.HttpStatusCode.OK };
-            return response.ToActionResult(this);
+            BaseResponse response = new(ResourcesList) { Success = true, Code = HttpStatusCode.OK };
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("add")]
     [HttpPost]
-    public async Task<ActionResult> Add([FromBody] ResourceBody inputBody)
+    public async Task<BaseResponse> Add([FromBody] ResourceBody inputBody)
     {
         try
         {
@@ -54,24 +54,25 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
 
     [Route("update")]
     [HttpPut]
-    public async Task<ActionResult> Update([FromBody] ResourceBody inputBody)
+    public async Task<BaseResponse> Update([FromBody] ResourceBody inputBody)
     {
         try
         {
@@ -84,23 +85,24 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("archive")]
     [HttpPut]
-    public async Task<ActionResult> Archive([FromBody] ResourceBody inputBody)
+    public async Task<BaseResponse> Archive([FromBody] ResourceBody inputBody)
     {
         try
         {
@@ -113,23 +115,24 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("returntowork")]
     [HttpPut]
-    public async Task<ActionResult> ReturnToWork([FromBody] ResourceBody inputBody)
+    public async Task<BaseResponse> ReturnToWork([FromBody] ResourceBody inputBody)
     {
         try
         {
@@ -142,23 +145,24 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("delete")]
     [HttpDelete]
-    public async Task<ActionResult> Delete([FromBody] ResourceBody inputBody)
+    public async Task<BaseResponse> Delete([FromBody] ResourceBody inputBody)
     {
         try
         {
@@ -171,17 +175,18 @@ public class ResourcesController(IMediator mediator, ILogger<ResourcesController
                 Code = code,
                 Errors = commandResponce.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 }

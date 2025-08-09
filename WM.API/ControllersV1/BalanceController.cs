@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using WM.API.Models;
-using WM.API.Utils;
 using WM.Application.UseCases_CQRS.Balances.Queries;
 
 namespace WM.API.ControllersV1;
@@ -17,23 +16,24 @@ public class BalancesController(IMediator mediator, ILogger<BalancesController> 
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult> Get()
+    public async Task<BaseResponse> Get()
     {
         try
         {
             GetBalanceBodiesListResponse BalancesList = await _mediator.Send(new GetBalanceBodiesListRequest());
-            BaseResponse response = new(BalancesList) { Success = true, Code = System.Net.HttpStatusCode.OK };
-            return response.ToActionResult(this);
+            BaseResponse response = new(BalancesList) { Success = true, Code = HttpStatusCode.OK };
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 }

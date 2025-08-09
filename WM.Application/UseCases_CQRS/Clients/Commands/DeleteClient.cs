@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Clients.Validators;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Clients.Commands;
 
@@ -18,8 +17,10 @@ public class DeleteClientCommandHandler(IMapper mapper, IClientRepository reposi
     public async Task<BaseCommandResponse> Handle(DeleteClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new DeleteClientValidator(repository);
-        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
+        var entity = await repository.GetByNameWithDependents(command.Body.Name);
+        var validator = new DeleteClientValidator(entity);
+        var validationResult = validator.Validate(command.Body);
+
 
         if (validationResult.IsValid == false)
         {
@@ -29,7 +30,7 @@ public class DeleteClientCommandHandler(IMapper mapper, IClientRepository reposi
         }
         else
         {
-            var entity = mapper.Map<ClientEntity>(command.Body);
+            entity = mapper.Map(command.Body, entity!);
             await repository.Delete(entity);
             response.Success = true;
             response.Message = "Клиент удален успешно";

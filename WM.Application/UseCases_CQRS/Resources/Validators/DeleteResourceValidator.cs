@@ -1,20 +1,19 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
+using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Resources.Validators;
 
 public class DeleteResourceValidator : AbstractValidator<ResourceBody>
 {
-    public DeleteResourceValidator(IResourceRepository repository)
+    public DeleteResourceValidator(ResourceEntity? resource)
     {
         RuleFor(c => c.Name)
-            .Custom(async (name, context) =>
+            .Custom((name, context) =>
             {
-                var resource = await repository.GetByNameWithDependents(name);
                 if (resource is null)
                 {
-                    context.AddFailure(nameof(name), "Клиента с таким именем не существует");
+                    context.AddFailure(nameof(name), "Ресурс с таким именем не существует");
                 }
                 else if (resource.AdmissionMovements.Count != 0)
                 {
@@ -35,8 +34,5 @@ public class DeleteResourceValidator : AbstractValidator<ResourceBody>
                     }
                 }
             });
-        RuleFor(c => c.Adress)
-            .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
-            .NotNull();
     }
 }

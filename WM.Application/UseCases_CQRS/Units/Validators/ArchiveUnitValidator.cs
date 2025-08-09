@@ -1,24 +1,21 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Units.Validators;
 
 public class ArchiveUnitValidator : AbstractValidator<UnitBody>
 {
-    public UnitEntity? Unit { get; private set; }
-    public ArchiveUnitValidator(IUnitsRepository repository)
+    public ArchiveUnitValidator(UnitEntity? entity)
     {
-        RuleFor(c => c.UnitDescription)
-            .Custom(async (name, context) =>
+        RuleFor(c => c.Name)
+            .Custom((name, context) =>
             {
-                Unit = await repository.GetByName(name);
-                if (Unit is null)
+                if (entity is null)
                 {
                     context.AddFailure(nameof(name), "Единицы измерения с таким названием не существует");
                 }
-                else if (Unit.State == State.Archived)
+                else if (entity.State == State.Archived)
                 {
                     context.AddFailure(nameof(name), "Единицы измерения с таким названием помещена в архив ранее");
                 }

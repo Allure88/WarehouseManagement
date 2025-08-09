@@ -3,10 +3,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using WM.API.Models;
-using WM.API.Utils;
 using WM.Application.Bodies;
-using WM.Application.UseCases_CQRS.Documents.Queries;
 using WM.Application.UseCases_CQRS.Documents.Commands;
+using WM.Application.UseCases_CQRS.Documents.Queries;
 
 namespace WM.API.ControllersV1;
 
@@ -14,18 +13,18 @@ namespace WM.API.ControllersV1;
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion("1")]
 [ApiController]
-public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsController>logger) : ControllerBase
+public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult> Get()
+    public async Task<BaseResponse> Get()
     {
         try
         {
             GetShippingDocBodiesListResponse ShippingDocsList = await _mediator.Send(new GetShippingDocBodiesListRequest());
             BaseResponse response = new(ShippingDocsList) { Success = true, Code = System.Net.HttpStatusCode.OK };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -35,13 +34,13 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("add")]
     [HttpPost]
-    public async Task<ActionResult> Add([FromBody] ShippingDocBody inputBody)
+    public async Task<BaseResponse> Add([FromBody] ShippingDocBody inputBody)
     {
         try
         {
@@ -54,7 +53,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -64,14 +63,14 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
 
     [Route("update")]
     [HttpPut]
-    public async Task<ActionResult> Update([FromBody] ShippingDocBody inputBody)
+    public async Task<BaseResponse> Update([FromBody] ShippingDocBody inputBody)
     {
         try
         {
@@ -84,7 +83,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -94,13 +93,13 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("sign")]
     [HttpPut]
-    public async Task<ActionResult> Update(string number)
+    public async Task<BaseResponse> Update(string number)
     {
         try
         {
@@ -113,7 +112,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -123,13 +122,13 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("revocate")]
     [HttpPut]
-    public async Task<ActionResult> Revocate(string number)
+    public async Task<BaseResponse> Revocate(string number)
     {
         try
         {
@@ -142,7 +141,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -152,13 +151,13 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("delete")]
     [HttpDelete]
-    public async Task<ActionResult> Delete([FromBody] ShippingDocBody inputBody)
+    public async Task<BaseResponse> Delete([FromBody] ShippingDocBody inputBody)
     {
         try
         {
@@ -171,7 +170,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
@@ -181,7 +180,7 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
                 Code = HttpStatusCode.InternalServerError,
                 Success = false
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 }

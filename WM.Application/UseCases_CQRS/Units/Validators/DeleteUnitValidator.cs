@@ -1,17 +1,16 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
+using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Units.Validators;
 
 public class DeleteUnitValidator : AbstractValidator<UnitBody>
 {
-    public DeleteUnitValidator(IUnitsRepository repository)
+    public DeleteUnitValidator(UnitEntity? unit)
     {
-        RuleFor(c => c.UnitDescription)
-           .Custom(async (name, context) =>
+        RuleFor(c => c.Name)
+           .Custom((name, context) =>
            {
-               var unit = await repository.GetByNameWithDependents(name);
                if (unit is null)
                {
                    context.AddFailure(nameof(name), "Единицы измерения с таким названием не существует");

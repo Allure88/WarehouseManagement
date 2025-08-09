@@ -1,26 +1,24 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
+using WM.Application.Mapper_Profiles;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class UpdateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
 {
-    public AdmissionDocEntity? AdmissionDocEntity { get; private set; }
-    public UpdateAdmissionDocValidator(IAdmissionDocRepository repository)
+    public UpdateAdmissionDocValidator(AdmissionDocEntity? AdmissionDocEntity)
     {
         RuleFor(c => c)
-            .Custom(async (docBody, context) =>
+            .Custom((docBody, context) =>
             {
-                AdmissionDocEntity = await repository.GetByNumber(docBody.Number);
                 if (AdmissionDocEntity is null)
                 {
                     context.AddFailure(nameof(docBody.Number), "Документ с таким номером не существует");
                 }
                 else
                 {
-                    if (docBody.Date > AdmissionDocEntity.Date)
+                    if (docBody.Date.Day > AdmissionDocEntity.Date.Day)
                     {
                         context.AddFailure("Нельзя изменить дату документа на предыдущую");
                     }
@@ -32,7 +30,7 @@ public class UpdateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
                         bool restrict = false;
                         //с составом движения ресурса
                         AdmissionResBody newAdmissionResource = docBody.ResBody;
-                        if (newAdmissionResource.UnitOfMeasurement.UnitDescription != resMvmn.UnitOfMeasurement.Name
+                        if (newAdmissionResource.UnitOfMeasurement.Name != resMvmn.UnitOfMeasurement.Name
                         || newAdmissionResource.Resource.Name != resMvmn.Resource.Name)
                         {
                             restrict = true;
@@ -41,7 +39,7 @@ public class UpdateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
                         if (!restrict)
                         {
                             //с архивным атрибутом
-                            if (resMvmn.Resource.State != newAdmissionResource.Resource.State)
+                            if (resMvmn.Resource.State != newAdmissionResource.Resource.State.ConvertToState())
                             {
                                 context.AddFailure("Разрешено изменять только количество. Изменения архива ресурса в разделе Ресурсы.");
                             }

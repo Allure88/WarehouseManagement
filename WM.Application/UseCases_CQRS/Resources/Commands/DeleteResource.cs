@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Resources.Validators;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Resources.Commands;
 
@@ -18,7 +17,8 @@ public class DeleteResourceCommandHandler(IMapper mapper, IResourceRepository re
     public async Task<BaseCommandResponse> Handle(DeleteResourceCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new DeleteResourceValidator(repository);
+        var entity = await repository.GetByNameWithDependents(command.Body.Name);
+        var validator = new DeleteResourceValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -29,12 +29,13 @@ public class DeleteResourceCommandHandler(IMapper mapper, IResourceRepository re
         }
         else
         {
-            var entity = mapper.Map<ResourceEntity>(command.Body);
+            entity = mapper.Map(command.Body, entity!);
             await repository.Delete(entity);
             response.Success = true;
             response.Message = "Ресурс удален успешно";
         }
 
         return response;
+
     }
 }

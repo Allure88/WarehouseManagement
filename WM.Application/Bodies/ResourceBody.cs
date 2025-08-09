@@ -1,9 +1,7 @@
-﻿using WM.Domain.Entities;
-
-namespace WM.Application.Bodies;
+﻿namespace WM.Application.Bodies;
 
 public class ResourceBody
 {
     public string Name { get; set; } = string.Empty;
-    public State State { get; set; } 
+    public string State { get; set; } = string.Empty;
 }

@@ -14,13 +14,15 @@ public class ReturnToWorkClientCommand(ClientBody body) : IRequest<BaseCommandRe
 
 
 
-public class ReturnToWorkClientRequestHandler(IClientRepository repository) : IRequestHandler<ArchiveClientCommand, BaseCommandResponse>
+public class ReturnToWorkClientRequestHandler(IClientRepository repository) : IRequestHandler<ReturnToWorkClientCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(ArchiveClientCommand command, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(ReturnToWorkClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new ReturnToWorkClientValidator(repository);
-        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
+        var entity = await repository.GetByName(command.Body.Name);
+
+        var validator = new ReturnToWorkClientValidator(entity);
+        var validationResult = validator.Validate(command.Body);
 
         if (validationResult.IsValid == false)
         {
@@ -30,12 +32,12 @@ public class ReturnToWorkClientRequestHandler(IClientRepository repository) : IR
         }
         else
         {
-            ClientEntity entity = validator.Client!;
-            entity.State = State.Active;
+            entity!.State = State.Active;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Клиент обновлен успешно";
         }
         return response;
     }
+
 }

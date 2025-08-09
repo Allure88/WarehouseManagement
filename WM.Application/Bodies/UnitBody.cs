@@ -4,6 +4,6 @@ namespace WM.Application.Bodies;
 
 public class UnitBody
 {
-    public string UnitDescription { get; set; } = string.Empty;
-    public State State { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
 }

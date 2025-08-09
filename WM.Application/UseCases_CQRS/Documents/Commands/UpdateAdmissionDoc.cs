@@ -16,9 +16,13 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
 {
     public async Task<BaseCommandResponse> Handle(UpdateAdmissionDocCommand command, CancellationToken cancellationToken)
     {
-        var newQuantity = command.Body.ResBody.Quantity;
+        command.Body.Date = command.Body.Date.ToUniversalTime();
+        float newQuantity = command.Body.ResBody.Quantity;
         var response = new BaseCommandResponse();
-        var validator = new UpdateAdmissionDocValidator(repository);
+        var entity = await repository.GetByNumber(command.Body.Number);
+        float oldQuantity = entity?.AdmissionRes?.Quantity ?? 0;
+
+        var validator = new UpdateAdmissionDocValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -29,9 +33,9 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
         }
         else
         {
-            var entity = validator.AdmissionDocEntity!;
             entity = mapper.Map(command.Body, entity);
-            if (entity.AdmissionRes != null)
+
+            if (entity!.AdmissionRes != null)
             {
                 var balances = await balanceRepository.GetAll();
 
@@ -50,7 +54,7 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
                 }
                 else
                 {
-                    balance.Quantity -= (entity.AdmissionRes.Quantity - newQuantity);
+                    balance.Quantity += (newQuantity - oldQuantity);
                     await balanceRepository.Update(balance);
                 }
             }

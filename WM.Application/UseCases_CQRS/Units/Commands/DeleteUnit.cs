@@ -4,7 +4,6 @@ using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Units.Validators;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Units.Commands;
 
@@ -18,7 +17,8 @@ public class DeleteUnitCommandHandler(IMapper mapper, IUnitsRepository repositor
     public async Task<BaseCommandResponse> Handle(DeleteUnitCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new DeleteUnitValidator(repository);
+        var entity = await repository.GetByNameWithDependents(command.Body.Name);
+        var validator = new DeleteUnitValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -29,7 +29,7 @@ public class DeleteUnitCommandHandler(IMapper mapper, IUnitsRepository repositor
         }
         else
         {
-            var entity = mapper.Map<UnitEntity>(command.Body);
+            entity = mapper.Map(command.Body, entity!);
             await repository.Delete(entity);
             response.Success = true;
             response.Message = "Единица измерения удалена успешно";

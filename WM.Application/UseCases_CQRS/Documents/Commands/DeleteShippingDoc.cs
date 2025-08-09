@@ -3,7 +3,7 @@ using MediatR;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
-using WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+using WM.Application.UseCases_CQRS.Documents.Validators;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;

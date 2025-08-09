@@ -18,8 +18,9 @@ public class ArchiveClientRequestHandler(IClientRepository repository) : IReques
     public async Task<BaseCommandResponse> Handle(ArchiveClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new ArchiveClientValidator(repository);
-        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
+        var entity = await repository.GetByName(command.Body.Name); 
+        var validator = new ArchiveClientValidator(entity);
+        var validationResult = validator.Validate(command.Body);
 
         if (validationResult.IsValid == false)
         {
@@ -29,8 +30,7 @@ public class ArchiveClientRequestHandler(IClientRepository repository) : IReques
         }
         else
         {
-            ClientEntity entity = validator.Client!;
-            entity.State = State.Archived;
+            entity!.State = State.Archived;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Клиент обновлен успешно";

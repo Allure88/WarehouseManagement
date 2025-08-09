@@ -100,13 +100,13 @@ namespace WM.Persistence.Migrations
                         column: x => x.ResourceId,
                         principalTable: "Resources",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Balances_UnitsOfMeasurement_UnitOfMeasurementId",
                         column: x => x.UnitOfMeasurementId,
                         principalTable: "UnitsOfMeasurement",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -144,15 +144,15 @@ namespace WM.Persistence.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Number = table.Column<string>(type: "text", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ShippingResId = table.Column<long>(type: "bigint", nullable: true)
+                    AdmissionResId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AdmissionDocs", x => x.Id);
                     table.UniqueConstraint("AK_AdmissionDocs_Number", x => x.Number);
                     table.ForeignKey(
-                        name: "FK_AdmissionDocs_AdmissionResEntity_ShippingResId",
-                        column: x => x.ShippingResId,
+                        name: "FK_AdmissionDocs_AdmissionResEntity_AdmissionResId",
+                        column: x => x.AdmissionResId,
                         principalTable: "AdmissionResEntity",
                         principalColumn: "Id");
                 });
@@ -166,7 +166,7 @@ namespace WM.Persistence.Migrations
                     Number = table.Column<string>(type: "text", nullable: false),
                     ClientId = table.Column<long>(type: "bigint", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    State = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     ShippingResId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -178,7 +178,7 @@ namespace WM.Persistence.Migrations
                         column: x => x.ClientId,
                         principalTable: "Clients",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ShippingDocs_ShippingResEntity_ShippingResId",
                         column: x => x.ShippingResId,
@@ -188,9 +188,9 @@ namespace WM.Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AdmissionDocs_ShippingResId",
+                name: "IX_AdmissionDocs_AdmissionResId",
                 table: "AdmissionDocs",
-                column: "ShippingResId");
+                column: "AdmissionResId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdmissionResEntity_ResourceId",

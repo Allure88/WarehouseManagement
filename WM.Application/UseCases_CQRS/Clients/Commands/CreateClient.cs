@@ -8,15 +8,15 @@ using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Clients.Commands;
 
-public class PostClientCommand(ClientBody body) : IRequest<BaseCommandResponse>
+public class CreateClientCommand(ClientBody body) : IRequest<BaseCommandResponse>
 {
     public ClientBody Body { get; set; } = body;
 }
 
 
-public class PostClientRequestHandler(IClientRepository repository, IMapper mapper) : IRequestHandler<PostClientCommand, BaseCommandResponse>
+public class CreateClientCommandHandler(IClientRepository repository, IMapper mapper) : IRequestHandler<CreateClientCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(PostClientCommand command, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(CreateClientCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
         var validator = new CreateClientValidator(repository);

@@ -3,7 +3,7 @@ using MediatR;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Responces;
-using WM.Application.UseCases_CQRS.Movements.Documents.Validators;
+using WM.Application.UseCases_CQRS.Documents.Validators;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;
@@ -18,6 +18,7 @@ public class DeleteAdmissionDocCommandHandler(IMapper mapper, IAdmissionDocRepos
     public async Task<BaseCommandResponse> Handle(DeleteAdmissionDocCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
+        var entity = await repository.GetByNumber(command.Body.Number);
         var validator = new DeleteAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
@@ -29,12 +30,9 @@ public class DeleteAdmissionDocCommandHandler(IMapper mapper, IAdmissionDocRepos
         }
         else
         {
-            var entity = mapper.Map<AdmissionDocEntity>(command.Body);
-
-            if (entity.AdmissionRes != null)
+            if (entity!.AdmissionRes != null)
             {
-                var balances = await balanceRepository.GetAll();
-
+                var balances = await balanceRepository.GetAllWithDependencies();
                 var balance = balances.First(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
                 b.Resource.Name == entity.AdmissionRes.Resource.Name);
                 balance.Quantity -= entity.AdmissionRes.Quantity;

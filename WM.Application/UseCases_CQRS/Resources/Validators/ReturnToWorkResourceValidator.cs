@@ -1,25 +1,22 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Resources.Validators;
 
 public class ReturnToWorkResourceValidator : AbstractValidator<ResourceBody>
 {
-    public ResourceEntity? Resource { get; private set; }
 
-    public ReturnToWorkResourceValidator(IResourceRepository repository)
+    public ReturnToWorkResourceValidator(ResourceEntity? resource)
     {
         RuleFor(c => c.Name)
-            .Custom(async (name, context) =>
+            .Custom((name, context) =>
             {
-                Resource = await repository.GetByName(name);
-                if (Resource is null)
+                if (resource is null)
                 {
                     context.AddFailure(nameof(name), "Ресурс с таким названием не существует");
                 }
-                else if (Resource.State == State.Archived)
+                else if (resource.State != State.Archived)
                 {
                     context.AddFailure(nameof(name), "Ресурс с таким названием не находится в архиве");
                 }

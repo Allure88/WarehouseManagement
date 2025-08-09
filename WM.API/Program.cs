@@ -28,6 +28,13 @@ public class Program
            .AddMvc();
 
 
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
+
         #region qwenAI swagger
 
         // Настройка Swagger/OpenAPI

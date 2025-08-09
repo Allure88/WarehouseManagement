@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using WM.API.Models;
-using WM.API.Utils;
 using WM.Application.Bodies;
 using WM.Application.UseCases_CQRS.Clients.Commands;
 using WM.Application.UseCases_CQRS.Clients.Queries;
@@ -19,58 +18,61 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
     private readonly IMediator _mediator = mediator;
 
     [HttpGet]
-    public async Task<ActionResult> Get()
+    public async Task<BaseResponse> Get()
     {
         try
         {
-            GetClientBodiesListResponse ClientsList = await _mediator.Send(new GetClientBodiesListRequest());
-            BaseResponse response = new(ClientsList) { Success = true, Code = HttpStatusCode.OK };
-            return response.ToActionResult(this);
+            GetClientBodiesListResponse clientsList = await _mediator.Send(new GetClientBodiesListRequest());
+            BaseResponse response = new(clientsList) { Success = true, Code = HttpStatusCode.OK };
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("add")]
     [HttpPost]
-    public async Task<ActionResult> Add([FromBody] ClientBody inputBody)
+    public async Task<BaseResponse> Add([FromBody] ClientBody inputBody)
+    //public async Task<BaseResponse> Add(JsonElement inputBody)
     {
         try
         {
-            var command = await _mediator.Send(new PostClientCommand(inputBody));
+            var command = await _mediator.Send(new CreateClientCommand(inputBody));
 
-            HttpStatusCode code = command.Success? HttpStatusCode.OK: HttpStatusCode.BadRequest;
+            HttpStatusCode code = command.Success ? HttpStatusCode.OK : HttpStatusCode.BadRequest;
             BaseResponse response = new(null)
             {
                 Success = command.Success,
                 Code = code,
-                Errors = command.Errors                
+                Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.ToString()]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("update")]
     [HttpPut]
-    public async Task<ActionResult> Update([FromBody] ClientBody inputBody)
+    public async Task<BaseResponse> Update([FromBody] ClientBody inputBody)
     {
         try
         {
@@ -83,24 +85,25 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.ToString()]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
 
     [Route("archive")]
     [HttpPut]
-    public async Task<ActionResult> Archive([FromBody] ClientBody inputBody)
+    public async Task<BaseResponse> Archive([FromBody] ClientBody inputBody)
     {
         try
         {
@@ -113,23 +116,24 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.ToString()]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
     [Route("returntowork")]
     [HttpPut]
-    public async Task<ActionResult> ReturnToWork([FromBody] ClientBody inputBody)
+    public async Task<BaseResponse> ReturnToWork([FromBody] ClientBody inputBody)
     {
         try
         {
@@ -142,24 +146,25 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.ToString()]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 
 
     [Route("delete")]
     [HttpDelete]
-    public async Task<ActionResult> Delete([FromBody] ClientBody inputBody)
+    public async Task<BaseResponse> Delete([FromBody] ClientBody inputBody)
     {
         try
         {
@@ -172,17 +177,18 @@ public class ClientsController(IMediator mediator, ILogger<ClientsController> lo
                 Code = code,
                 Errors = command.Errors
             };
-            return response.ToActionResult(this);
+            return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.ToString()]
             };
-            return baseResponse.ToActionResult(this);
+            return baseResponse;
         }
     }
 }

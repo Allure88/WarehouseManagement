@@ -14,13 +14,15 @@ public class ReturnToWorkResourceCommand(ResourceBody body) : IRequest<BaseComma
 
 
 
-public class ReturnToWorkResourceRequestHandler(IResourceRepository repository) : IRequestHandler<ArchiveResourceCommand, BaseCommandResponse>
+public class ReturnToWorkResourceRequestHandler(IResourceRepository repository) : IRequestHandler<ReturnToWorkResourceCommand, BaseCommandResponse>
 {
-    public async Task<BaseCommandResponse> Handle(ArchiveResourceCommand command, CancellationToken cancellationToken)
+    public async Task<BaseCommandResponse> Handle(ReturnToWorkResourceCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new ReturnToWorkResourceValidator(repository);
-        var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
+        var entity = await repository.GetByName(command.Body.Name);
+
+        var validator = new ReturnToWorkResourceValidator(entity);
+        var validationResult = validator.Validate(command.Body);
 
         if (validationResult.IsValid == false)
         {
@@ -30,8 +32,7 @@ public class ReturnToWorkResourceRequestHandler(IResourceRepository repository) 
         }
         else
         {
-            ResourceEntity entity = validator.Resource!;
-            entity.State = State.Active;
+            entity!.State = State.Active;
             await repository.Update(entity);
             response.Success = true;
             response.Message = "Ресурс обновлен успешно";

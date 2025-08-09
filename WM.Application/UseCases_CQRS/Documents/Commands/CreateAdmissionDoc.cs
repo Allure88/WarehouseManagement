@@ -13,11 +13,17 @@ public class CreateAdmissionDocCommand(AdmissionDocBody body) : IRequest<BaseCom
 }
 
 
-public class CreateAdmissionDocCommandHandler(IAdmissionDocRepository repository, IBalanceRepository balanceRepository, IMapper mapper) : IRequestHandler<CreateAdmissionDocCommand, BaseCommandResponse>
+public class CreateAdmissionDocCommandHandler(
+    IAdmissionDocRepository repository,
+    IBalanceRepository balanceRepository,
+    IUnitsRepository unitsRepository,
+    IResourceRepository resourceRepository,
+    IMapper mapper) : IRequestHandler<CreateAdmissionDocCommand, BaseCommandResponse>
 {
     public async Task<BaseCommandResponse> Handle(CreateAdmissionDocCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
+        request.Body.Date = request.Body.Date.ToUniversalTime();
         var validator = new CreateAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
@@ -30,8 +36,24 @@ public class CreateAdmissionDocCommandHandler(IAdmissionDocRepository repository
         else
         {
             var entity = mapper.Map<AdmissionDocEntity>(request.Body);
-            if (entity.AdmissionRes != null)
+            var admissionRes = entity.AdmissionRes;
+
+            if (admissionRes != null)
             {
+                var unit = await unitsRepository.GetByName(admissionRes.UnitOfMeasurement.Name);
+                var resource = await resourceRepository.GetByName(admissionRes.Resource.Name);
+
+                if (unit is null || resource is null)   
+                {
+                    response.Success = false;
+                    response.Message = "Документ не сохранен";
+                    response.Errors = ["Ресурс или единица измерения в базе не найдены"];
+                    return response;
+                }
+                admissionRes.UnitOfMeasurement = unit;
+                admissionRes.Resource = resource;
+
+
                 var balances = await balanceRepository.GetAll();
 
                 var balance = balances.FirstOrDefault(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
@@ -41,19 +63,21 @@ public class CreateAdmissionDocCommandHandler(IAdmissionDocRepository repository
                 {
                     balance = new()
                     {
-                        Resource = entity.AdmissionRes.Resource,
-                        UnitOfMeasurement = entity.AdmissionRes.UnitOfMeasurement,
-                        Quantity = entity.AdmissionRes.Quantity
+                        Resource = resource,
+                        UnitOfMeasurement = unit,
+                        Quantity = admissionRes.Quantity
                     };
                     await balanceRepository.Add(balance);
                 }
                 else
                 {
-                    balance.Quantity += entity.AdmissionRes.Quantity;
+                    balance.Quantity += admissionRes.Quantity;
                     await balanceRepository.Update(balance);
                 }
             }
-            var addedEntity = await repository.Add(entity);
+
+
+            await repository.Add(entity);
 
 
             response.Success = true;
