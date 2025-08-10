@@ -37,7 +37,7 @@ public class UpdateAdmissionDocRequestHandler(IAdmissionDocRepository repository
 
             if (entity!.AdmissionRes != null)
             {
-                var balances = await balanceRepository.GetAll();
+                var balances = await balanceRepository.GetAllWithDependencies();
 
                 var balance = balances.FirstOrDefault(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
                 b.Resource.Name == entity.AdmissionRes.Resource.Name);

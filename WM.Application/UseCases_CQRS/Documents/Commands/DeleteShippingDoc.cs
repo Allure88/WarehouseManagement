@@ -14,12 +14,13 @@ public class DeleteShippingDocCommand(ShippingDocBody body) : IRequest<BaseComma
 }
 
 
-public class DeleteShippingDocCommandHandler(IMapper mapper, IShippingDocRepository repository) : IRequestHandler<DeleteShippingDocCommand, BaseCommandResponse>
+public class DeleteShippingDocCommandHandler(IShippingDocRepository repository) : IRequestHandler<DeleteShippingDocCommand, BaseCommandResponse>
 {
     public async Task<BaseCommandResponse> Handle(DeleteShippingDocCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new DeleteShippingDocValidator(repository);
+        var entity = await repository.GetByNumber(command.Body.Number);
+        var validator = new DeleteShippingDocValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Body, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -30,9 +31,7 @@ public class DeleteShippingDocCommandHandler(IMapper mapper, IShippingDocReposit
         }
         else
         {
-            var entity = mapper.Map<ShippingDocEntity>(command.Body);
-
-            await repository.Delete(entity);
+            await repository.Delete(entity!);
             response.Success = true;
             response.Message = "Документ списания удален успешно";
         }

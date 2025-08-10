@@ -29,10 +29,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }
@@ -58,10 +59,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }
@@ -88,10 +90,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }
@@ -117,10 +120,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }
@@ -146,10 +150,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }
@@ -175,10 +180,11 @@ public class ShippingDocsController(IMediator mediator, ILogger<ShippingDocsCont
         catch (Exception ex)
         {
             logger.LogError(ex.ToString());
-            BaseResponse baseResponse = new(new { ex.Message })
+            BaseResponse baseResponse = new(null)
             {
                 Code = HttpStatusCode.InternalServerError,
-                Success = false
+                Success = false,
+                Errors = [ex.Message]
             };
             return baseResponse;
         }

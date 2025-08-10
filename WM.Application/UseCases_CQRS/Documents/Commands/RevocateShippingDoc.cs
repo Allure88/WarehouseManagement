@@ -18,7 +18,8 @@ public class RevocateShippingDocCommandHandler(IShippingDocRepository docReposit
     public async Task<BaseCommandResponse> Handle(RevocateShippingDocCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new RevocateShippingDocValidator(docRepository);
+        var entity = await docRepository.GetByNumber(command.Number);
+        var validator = new RevocateShippingDocValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Number, cancellationToken);
 
         if (validationResult.IsValid == false)
@@ -29,9 +30,8 @@ public class RevocateShippingDocCommandHandler(IShippingDocRepository docReposit
         }
         else
         {
-            var entity = validator.ShippingDocEntity!;
-            entity.Status = DocumentStatus.Revocated;
-            var balances = await balanceRepository.GetAll();
+            entity!.Status = DocumentStatus.Revocated;
+            var balances = await balanceRepository.GetAllWithDependencies();
 
             var balance = balances.First(b => b.UnitOfMeasurement.Name == entity.ShippingRes.UnitOfMeasurement.Name &&
             b.Resource.Name == entity.ShippingRes.Resource.Name);

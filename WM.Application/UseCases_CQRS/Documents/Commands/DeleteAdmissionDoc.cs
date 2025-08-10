@@ -13,7 +13,7 @@ public class DeleteAdmissionDocCommand(AdmissionDocBody body) : IRequest<BaseCom
     public AdmissionDocBody Body { get; set; } = body;
 }
 
-public class DeleteAdmissionDocCommandHandler(IMapper mapper, IAdmissionDocRepository repository, IBalanceRepository balanceRepository) : IRequestHandler<DeleteAdmissionDocCommand, BaseCommandResponse>
+public class DeleteAdmissionDocCommandHandler(IAdmissionDocRepository repository, IBalanceRepository balanceRepository) : IRequestHandler<DeleteAdmissionDocCommand, BaseCommandResponse>
 {
     public async Task<BaseCommandResponse> Handle(DeleteAdmissionDocCommand command, CancellationToken cancellationToken)
     {

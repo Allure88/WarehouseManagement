@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
-using WM.Application.Contracts;
 using WM.Application.Mapper_Profiles;
 using WM.Domain.Entities;
 
@@ -8,21 +7,19 @@ namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class UpdateShippingDocValidator : AbstractValidator<ShippingDocBody>
 {
-    public ShippingDocEntity? ShippingDocEntity { get; private set; }
 
-    public UpdateShippingDocValidator(IShippingDocRepository repository)
+    public UpdateShippingDocValidator(ShippingDocEntity? ShippingDocEntity)
     {
         RuleFor(c => c)
-            .Custom(async (docBody, context) =>
+            .Custom((docBody, context) =>
             {
-                ShippingDocEntity = await repository.GetByNumber(docBody.Number);
                 if (ShippingDocEntity is null)
                 {
                     context.AddFailure(nameof(docBody.Number), "Документ с таким номером не существует");
                 }
                 else
                 {
-                    if (docBody.Date > ShippingDocEntity.Date)
+                    if (docBody.Date.Day > ShippingDocEntity.Date.Day)
                     {
                         context.AddFailure("Нельзя изменить дату документа на предыдущую");
                     }

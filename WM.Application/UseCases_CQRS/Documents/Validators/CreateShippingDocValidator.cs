@@ -33,7 +33,7 @@ public class CreateShippingDocValidator:AbstractValidator<ShippingDocBody>
 
         RuleFor(c => c.Date)
             .NotNull().WithMessage("{ProperyName} не должно быть путым")
-            .GreaterThan(DateTime.Now).WithMessage("Нельзя использовать предыдущую дату");
+            .LessThanOrEqualTo(DateTime.Today).WithMessage("Нельзя использовать предыдущую дату");
 
     }
 }

@@ -16,9 +16,11 @@ public class SignShippingDocCommandHandler(IShippingDocRepository docRepository,
     public async Task<BaseCommandResponse> Handle(SignShippingDocCommand command, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new SignShippingDocValidator(docRepository);
+        var entity = await docRepository.GetByNumber(command.Number);
+        var validator = new SignShippingDocValidator(entity);
         var validationResult = await validator.ValidateAsync(command.Number, cancellationToken);
 
+       
         if (validationResult.IsValid == false)
         {
             response.Success = false;
@@ -27,9 +29,8 @@ public class SignShippingDocCommandHandler(IShippingDocRepository docRepository,
         }
         else
         {
-            var entity = validator.ShippingDocEntity!;
-            entity.Status = DocumentStatus.Approved;
-            var balances = await balanceRepository.GetAll();
+            entity!.Status = DocumentStatus.Approved;
+            var balances = await balanceRepository.GetAllWithDependencies();
 
             var balance = balances.First(b => b.UnitOfMeasurement.Name == entity.ShippingRes.UnitOfMeasurement.Name &&
             b.Resource.Name == entity.ShippingRes.Resource.Name);

@@ -8,7 +8,6 @@ public class MainProfile : Profile
 {
     public MainProfile()
     {
-        CreateMap<ShippingDocBody, ShippingDocEntity>();
 
         CreateMap<ResourceBody, ResourceEntity>()
             .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State.ConvertToState()));
@@ -40,8 +39,16 @@ public class MainProfile : Profile
         CreateMap<AdmissionResBody, AdmissionResEntity>();
         CreateMap<AdmissionResEntity, AdmissionResBody>();
 
-        CreateMap<ShippingDocBody, ShippingDocEntity>();
         CreateMap<ShippingResBody, ShippingResEntity>();
+        CreateMap<ShippingResEntity, ShippingResBody>();
+
+        CreateMap<ShippingDocBody, ShippingDocEntity>()
+          .ForMember(dest => dest.ShippingRes, opt => opt.MapFrom(src => src.ResBody))
+          .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ConvertToStatus()));
+
+        CreateMap<ShippingDocEntity, ShippingDocBody>()
+           .ForMember(dest => dest.ResBody, opt => opt.MapFrom(src => src.ShippingRes))
+           .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ConvertToString()));
     }
 
 }
@@ -63,5 +70,24 @@ public static class Extensions
     public static string ConvertToString(this State state)
     {
         return state.ToString();
+    }
+
+
+    public static DocumentStatus ConvertToStatus(this string stateStr)
+    {
+        stateStr = stateStr.ToLower();
+        if (stateStr == "created")
+            return DocumentStatus.Created;
+        else if (stateStr == "approved")
+            return DocumentStatus.Approved;
+        else if (stateStr == "revocated")
+            return DocumentStatus.Revocated;
+        else
+            throw new NotImplementedException($"Невозможно преобразовать {stateStr} в состояние");
+    }
+
+    public static string ConvertToString(this DocumentStatus status)
+    {
+        return status.ToString();
     }
 }

@@ -54,7 +54,7 @@ public class CreateAdmissionDocCommandHandler(
                 admissionRes.Resource = resource;
 
 
-                var balances = await balanceRepository.GetAll();
+                var balances = await balanceRepository.GetAllWithDependencies();
 
                 var balance = balances.FirstOrDefault(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
                 b.Resource.Name == entity.AdmissionRes.Resource.Name);

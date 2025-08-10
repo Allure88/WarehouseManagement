@@ -1,50 +1,47 @@
 ﻿using FluentValidation;
-using WM.Application.Contracts;
 using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class SignShippingDocValidator : AbstractValidator<string>
 {
-    public ShippingDocEntity? ShippingDocEntity { get; private set; }
-    public SignShippingDocValidator(IShippingDocRepository repository)
+    public SignShippingDocValidator(ShippingDocEntity? shippingDocEntity)
     {
         RuleFor(c => c)
-            .Custom(async (number, context) =>
+            .Custom((number, context) =>
             {
-                ShippingDocEntity = await repository.GetByNumber(number);
-                if (ShippingDocEntity is null)
+                if (shippingDocEntity is null)
                 {
                     context.AddFailure("Документ с таким номером не существует");
                 }
                 else
                 {
-                    if (ShippingDocEntity.Status == DocumentStatus.Approved)
+                    if (shippingDocEntity.Status == DocumentStatus.Approved)
                     {
                         context.AddFailure("Документ подписан ранее. Его возможно отозвать.");
                     }
                     //с архивным атрибутом
-                    if (ShippingDocEntity.ShippingRes.Resource.State == State.Archived)
+                    if (shippingDocEntity.ShippingRes.Resource.State == State.Archived)
                     {
                         context.AddFailure("Ресурс в архиве. Подпиь невозможна. Изменения архива ресурса в разделе Ресурсы.");
                     }
-                    if (ShippingDocEntity.ShippingRes.UnitOfMeasurement.State == State.Archived)
+                    if (shippingDocEntity.ShippingRes.UnitOfMeasurement.State == State.Archived)
                     {
                         context.AddFailure("Единица измерения в архиве. Подпиь невозможна. Изменения архива в разделе Единицы измерения.");
                     }
-                    if (ShippingDocEntity.Client.State == State.Archived)
+                    if (shippingDocEntity.Client.State == State.Archived)
                     {
                         context.AddFailure("Клиент в архиве. Подпиь невозможна. Изменения архива в разделе Клиенты.");
                     }
 
-                    var diminishingQuantity = ShippingDocEntity.ShippingRes.Quantity;
+                    var diminishingQuantity = shippingDocEntity.ShippingRes.Quantity;
 
                     if (diminishingQuantity > 0)
                     {
-                        var diminishingUnit = ShippingDocEntity.ShippingRes.UnitOfMeasurement;
-                        foreach (var balance in ShippingDocEntity.ShippingRes.Resource.Balances)
+                        var diminishingUnit = shippingDocEntity.ShippingRes.UnitOfMeasurement;
+                        foreach (var balance in shippingDocEntity.ShippingRes.Resource.Balances)
                         {
-                            if (balance.UnitOfMeasurement == ShippingDocEntity.ShippingRes.UnitOfMeasurement)
+                            if (balance.UnitOfMeasurement == shippingDocEntity.ShippingRes.UnitOfMeasurement)
                             {
                                 var currentQuantity = balance.Quantity;
                                 if (currentQuantity < diminishingQuantity)

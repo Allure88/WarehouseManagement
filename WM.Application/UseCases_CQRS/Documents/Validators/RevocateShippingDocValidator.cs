@@ -6,33 +6,32 @@ namespace WM.Application.UseCases_CQRS.Documents.Validators;
 
 public class RevocateShippingDocValidator : AbstractValidator<string>
 {
-    public ShippingDocEntity? ShippingDocEntity { get; private set; }
-    public RevocateShippingDocValidator(IShippingDocRepository repository)
+    public RevocateShippingDocValidator(ShippingDocEntity? shippingDocEntity)
     {
         RuleFor(c => c)
-            .Custom(async (number, context) =>
+            .Custom((number, context) =>
             {
-                ShippingDocEntity = await repository.GetByNumber(number);
-                if (ShippingDocEntity is null)
+                if (shippingDocEntity is null)
                 {
                     context.AddFailure("Документ с таким номером не существует");
                 }
                 else
                 {
-                    if (ShippingDocEntity.Status != DocumentStatus.Approved)
+                    if (shippingDocEntity.Status != DocumentStatus.Approved)
                     {
                         context.AddFailure("Документ не подписан ранее. Его возможно подписать.");
                     }
+
                     //с архивным атрибутом
-                    if (ShippingDocEntity.ShippingRes.Resource.State == State.Archived)
+                    if (shippingDocEntity.ShippingRes.Resource.State == State.Archived)
                     {
                         context.AddFailure("Ресурс в архиве. Отзыв невозможен. Изменения архива ресурса в разделе Ресурсы.");
                     }
-                    if (ShippingDocEntity.ShippingRes.UnitOfMeasurement.State == State.Archived)
+                    if (shippingDocEntity.ShippingRes.UnitOfMeasurement.State == State.Archived)
                     {
                         context.AddFailure("Единица измерения  в архиве. Отзыв невозможен. Изменения архива в разделе Единицы измерения.");
                     }
-                    if (ShippingDocEntity.Client.State == State.Archived)
+                    if (shippingDocEntity.Client.State == State.Archived)
                     {
                         context.AddFailure("Клиент в архиве. Отзыв невозможен. Изменения архива в разделе Клиенты.");
                     }
