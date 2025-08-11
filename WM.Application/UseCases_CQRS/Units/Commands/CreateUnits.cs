@@ -18,7 +18,7 @@ public class CreateUnitCommandHandler(IUnitsRepository repository, IMapper mappe
     public async Task<BaseCommandResponse> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        var validator = new PostUnitValidator(repository);
+        var validator = new CreateUnitValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
         if (validationResult.IsValid == false)

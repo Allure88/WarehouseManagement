@@ -32,7 +32,7 @@ public class DeleteAdmissionDocCommandHandler(IAdmissionDocRepository repository
         {
             if (entity!.AdmissionRes != null)
             {
-                var balances = await balanceRepository.GetAllWithDependencies();
+                var balances = entity!.AdmissionRes.Resource.Balances; 
                 var balance = balances.First(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
                 b.Resource.Name == entity.AdmissionRes.Resource.Name);
                 balance.Quantity -= entity.AdmissionRes.Quantity;

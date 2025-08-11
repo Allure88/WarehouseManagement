@@ -19,7 +19,7 @@ public class UpdateShippingDocValidator : AbstractValidator<ShippingDocBody>
                 }
                 else
                 {
-                    if (docBody.Date.Day > ShippingDocEntity.Date.Day)
+                    if (docBody.Date.Date > ShippingDocEntity.Date.Date)
                     {
                         context.AddFailure("Нельзя изменить дату документа на предыдущую");
                     }
@@ -35,7 +35,7 @@ public class UpdateShippingDocValidator : AbstractValidator<ShippingDocBody>
                         || newAdmissionResource.Resource.Name != resMvmn.Resource.Name)
                         {
                             restrict = true;
-                            context.AddFailure("Разрешено изменять только количество. Изменение состава раесурса через удаление.");
+                            context.AddFailure("Разрешено изменять только количество. Изменение состава ресурса через удаление.");
                         }
                         if (!restrict)
                         {

@@ -18,7 +18,7 @@ public class UpdateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
                 }
                 else
                 {
-                    if (docBody.Date.Day > AdmissionDocEntity.Date.Day)
+                    if (docBody.Date.Date > AdmissionDocEntity.Date.Date)
                     {
                         context.AddFailure("Нельзя изменить дату документа на предыдущую");
                     }
@@ -34,7 +34,7 @@ public class UpdateAdmissionDocValidator : AbstractValidator<AdmissionDocBody>
                         || newAdmissionResource.Resource.Name != resMvmn.Resource.Name)
                         {
                             restrict = true;
-                            context.AddFailure("Разрешено изменять только количество. Изменение состава раесурса через удаление.");
+                            context.AddFailure("Разрешено изменять только количество. Изменение состава ресурса через удаление.");
                         }
                         if (!restrict)
                         {

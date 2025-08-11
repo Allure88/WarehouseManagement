@@ -31,7 +31,7 @@ public class RevocateShippingDocCommandHandler(IShippingDocRepository docReposit
         else
         {
             entity!.Status = DocumentStatus.Revocated;
-            var balances = await balanceRepository.GetAllWithDependencies();
+            var balances = entity!.ShippingRes.Resource.Balances;
 
             var balance = balances.First(b => b.UnitOfMeasurement.Name == entity.ShippingRes.UnitOfMeasurement.Name &&
             b.Resource.Name == entity.ShippingRes.Resource.Name);

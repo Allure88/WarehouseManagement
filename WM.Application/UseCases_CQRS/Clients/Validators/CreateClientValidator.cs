@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
 using WM.Application.Contracts;
-using WM.Domain.Entities;
 
 namespace WM.Application.UseCases_CQRS.Clients.Validators;
 
@@ -14,14 +13,14 @@ public class CreateClientValidator : AbstractValidator<ClientBody>
            {
                return await repository.GetByName(name) is null;
            })
-           .WithMessage("Клиент с именем {ComparisonValue} создан ранее.")
-           .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
+           .WithMessage("Клиент с именем создан ранее.")
+           .NotEmpty().WithMessage("Поле Имя не должно быть путым")
            .NotNull()
            .MaximumLength(50).WithMessage("Максимальная длина 50 символов");
 
 
         RuleFor(c => c.Adress)
-            .NotEmpty().WithMessage("{ProperyName} не должно быть путым")
+            .NotEmpty().WithMessage("Поле адрес не должно быть пустым")
             .NotNull();
     }
 
