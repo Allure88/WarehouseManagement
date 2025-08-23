@@ -1,4 +1,4 @@
-﻿namespace WM.Domain.Entities;
+﻿namespace WM.Domain.Models;
 
 public enum State { Active, Archived }
 

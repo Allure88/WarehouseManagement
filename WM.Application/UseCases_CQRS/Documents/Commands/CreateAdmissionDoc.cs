@@ -5,6 +5,7 @@ using WM.Application.Contracts;
 using WM.Application.Responces;
 using WM.Application.UseCases_CQRS.Documents.Validators;
 using WM.Domain.Entities;
+using WM.Domain.Models;
 
 namespace WM.Application.UseCases_CQRS.Documents.Commands;
 public class CreateAdmissionDocCommand(AdmissionDocBody body) : IRequest<BaseCommandResponse>
@@ -20,10 +21,10 @@ public class CreateAdmissionDocCommandHandler(
     IResourceRepository resourceRepository,
     IMapper mapper) : IRequestHandler<CreateAdmissionDocCommand, BaseCommandResponse>
 {
+
     public async Task<BaseCommandResponse> Handle(CreateAdmissionDocCommand request, CancellationToken cancellationToken)
     {
         var response = new BaseCommandResponse();
-        request.Body.Date = request.Body.Date.ToUniversalTime();
         var validator = new CreateAdmissionDocValidator(repository);
         var validationResult = await validator.ValidateAsync(request.Body, cancellationToken);
 
@@ -35,55 +36,109 @@ public class CreateAdmissionDocCommandHandler(
         }
         else
         {
-            var entity = mapper.Map<AdmissionDocEntity>(request.Body);
-            var admissionRes = entity.AdmissionRes;
+            AdmissionDocBody body = request.Body;
+            AdmissionRes? admissionRes = mapper.Map<AdmissionResBody, AdmissionRes>(request.Body.ResBody);
+            var (admissionDoc, errors) = AdmissionDoc.GetInstance(admissionRes, body.Number, CheckIfNumberExists, body.Date, GetUnitFromStorageByName, GetResourceFromStorageByName);
 
-            if (admissionRes != null)
+            if (admissionDoc is null)
             {
-                var unit = await unitsRepository.GetByName(admissionRes.UnitOfMeasurement.Name);
-                var resource = await resourceRepository.GetByName(admissionRes.Resource.Name);
-
-                if (unit is null || resource is null)   
-                {
-                    response.Success = false;
-                    response.Message = "Документ не сохранен";
-                    response.Errors = ["Ресурс или единица измерения в базе не найдены"];
-                    return response;
-                }
-                admissionRes.UnitOfMeasurement = unit;
-                admissionRes.Resource = resource;
-
-
-                var balances = await balanceRepository.GetAllWithDependencies();
-
-                var balance = balances.FirstOrDefault(b => b.UnitOfMeasurement.Name == entity.AdmissionRes?.UnitOfMeasurement.Name &&
-                b.Resource.Name == entity.AdmissionRes.Resource.Name);
-
-                if (balance == null)
-                {
-                    balance = new()
-                    {
-                        Resource = resource,
-                        UnitOfMeasurement = unit,
-                        Quantity = admissionRes.Quantity
-                    };
-                    await balanceRepository.Add(balance);
-                }
-                else
-                {
-                    balance.Quantity += admissionRes.Quantity;
-                    await balanceRepository.Update(balance);
-                }
+                response.Success = false;
+                response.Message = "Документ не сохранен";
+                response.Errors = errors;
+                return response;
             }
 
 
-            await repository.Add(entity);
+
+            var docEntity = mapper.Map<AdmissionDocEntity>(admissionDoc);
+            admissionRes = admissionDoc.AdmissionRes;
+            if (admissionRes is not null)
+            {
+                UnitEntity unit = (await unitsRepository.GetByName(admissionRes.UnitOfMeasurement.Name))!;
+                ResourceEntity resource = (await resourceRepository.GetByName(admissionRes.Resource.Name))!;
+                docEntity.AdmissionRes!.UnitOfMeasurement = unit;
+                docEntity.AdmissionRes.Resource = resource;
 
 
+                var balanceEntity = await balanceRepository.GetByPair(docEntity.AdmissionRes.UnitOfMeasurement.Name, docEntity.AdmissionRes.Resource.Name);
+
+
+                Balance balance;
+
+
+                if (balanceEntity == null)
+                {
+                    balance = new()
+                    {
+                        Resource = admissionRes.Resource,
+                        UnitOfMeasurement = admissionRes.UnitOfMeasurement,
+                        Quantity = 0
+                    };
+
+
+                    var (applied, balanceErrors) = balance.Apply(admissionDoc);
+                    if (applied)
+                    {
+                        balanceEntity = mapper.Map<BalanceEntity>(balance);
+                        balanceEntity.UnitOfMeasurement = unit;
+                        balanceEntity.Resource = resource;
+                        await balanceRepository.Add(balanceEntity);
+                    }
+                    else
+                    {
+                        response.Success = false;
+                        response.Message = "Документ не сохранен";
+                        response.Errors = balanceErrors;
+                        return response;
+                    }
+                }
+                else
+                {
+                    balance = mapper.Map<Balance>(balanceEntity);
+                    var (applied, balanceErrors) = balance.Apply(admissionDoc);
+                    if (applied)
+                    {
+                        balanceEntity = mapper.Map<BalanceEntity>(balance);
+                        balanceEntity.UnitOfMeasurement = unit;
+                        balanceEntity.Resource = resource;
+                        await balanceRepository.Update(balanceEntity);
+                    }
+                    else
+                    {
+                        response.Success = false;
+                        response.Message = "Документ не сохранен";
+                        response.Errors = balanceErrors;
+                        return response;
+                    }
+                    //balance.Quantity += admissionRes.Quantity;
+                    //await balanceRepository.Update(balance);
+                }
+
+            }
+
+
+
+            await repository.Add(docEntity);
             response.Success = true;
             response.Message = "Документ сохранен успешно";
         }
 
         return response;
+    }
+
+    public Domain.Models.Unit GetUnitFromStorageByName(string name)
+    {
+        return mapper.Map<Domain.Models.Unit>(unitsRepository.GetByName(name));
+    }
+
+    public bool CheckIfNumberExists(string number)
+    {
+        return repository.GetByNumber(number) is not null;
+    }
+
+
+    public Resource GetResourceFromStorageByName(string name)
+    {
+        return mapper.Map<Resource>(resourceRepository.GetByName(name));
     }
 }

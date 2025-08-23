@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using WM.Application.Bodies;
 using WM.Domain.Entities;
+using WM.Domain.Models;
 
 namespace WM.Application.UseCases_CQRS.Resources.Validators;
 

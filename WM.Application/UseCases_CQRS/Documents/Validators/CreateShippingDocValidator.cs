@@ -2,7 +2,7 @@
 using WM.Application.Bodies;
 using WM.Application.Contracts;
 using WM.Application.Mapper_Profiles;
-using WM.Domain.Entities;
+using WM.Domain.Models;
 
 namespace WM.Application.UseCases_CQRS.Documents.Validators;
 

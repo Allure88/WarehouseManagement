@@ -1,4 +1,6 @@
-﻿namespace WM.Domain.Entities
+﻿using WM.Domain.Models;
+
+namespace WM.Domain.Entities
 {
     public class UnitEntity : BaseEntity
     {

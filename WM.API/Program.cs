@@ -102,8 +102,16 @@ public class Program
             });
         }
 
+        //app.UseDefaultFiles();
+        //app.UseStaticFiles();
+
         app.MapGet("/", () => "VM started...");
         app.MapControllers();
+
+        //app.MapGet("/", () =>
+        //{
+        //    return Results.Redirect("/Index.html");
+        //});
         app.Run();
     }
 }

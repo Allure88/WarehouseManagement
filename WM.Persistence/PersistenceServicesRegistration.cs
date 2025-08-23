@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using WM.Application.Contracts;
 using WM.Persistence.Repositories;
 
@@ -13,11 +14,13 @@ public static class PersistenceServicesRegistration
         string connString = configuration.GetConnectionString("PostgresWmDbConnectionString")!;
 
         services.AddDbContext<WmDbContext>(options =>
-        {
-            options.UseNpgsql(connString);
-
-            //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);  
-        });
+                options.UseNpgsql(connString
+                   //,npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(
+                   // maxRetryCount: 5,
+                   // maxRetryDelay: TimeSpan.FromSeconds(30),
+                   // errorCodesToAdd: ["08006", "08001", "08004"] // network, connection errors
+              //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);  
+        ));
 
         services.AddScoped<IUnitsRepository, UnitsRepository>(); //
         services.AddScoped<IResourceRepository, ResourceRepository>(); //
