@@ -12,6 +12,25 @@ public class Balance
 
     public (bool allpied, List<string> errors) Apply(AdmissionDoc admissionDoc)
     {
-        throw new NotImplementedException();
+        List<string> errors = [];
+        bool isOk = true;
+
+
+        if (admissionDoc.AdmissionRes is null)
+        {
+            errors.Add("Отсутствуют ресурсы для изменения");
+        }
+        else if (admissionDoc.AdmissionRes.Quantity < 1e-4)
+        {
+            errors.Add("Некорректное количество ресурса.");
+        }
+
+        if(errors.Count == 0)
+        {
+            Quantity += admissionDoc.AdmissionRes!.Quantity;
+        }
+
+
+        return(isOk, errors);
     }
 }
